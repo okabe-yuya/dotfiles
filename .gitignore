@@ -14,19 +14,17 @@
 !.profile
 
 # Zsh
-!.zshrc
-!.zsh
-!.zsh/*
-!.zsh/contrib
-!.zsh/contrib/*
+!/zsh/.zshrc
+!/zsh/*.sh
+
 # Do ignore the data directory (my construct, it's where completion cache,
 # history etc live)
-.zsh/data
-.zsh/data/*
+zsh/.zsh/data
+zsh/.zsh/data/*
 # Do ignore local/sensitive settings
-.zsh/*local
+zsh/.zsh/*local
 # Swapfiles (sigh)
-.zsh/*.swp
+zsh/.zsh/*.swp
 
 # Git aliases, identification info
 !.gitconfig
