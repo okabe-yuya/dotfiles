@@ -1,0 +1,2 @@
+lua require('Comment').setup()
+

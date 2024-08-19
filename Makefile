@@ -1,14 +1,18 @@
-.PHONY: zsh tmux starship
+.PHONY: zsh tmux nvim
+
+unlink_if_file_exists = \
+	if [ -e $1 ]; then \
+		unlink $1; \
+	fi
 
 zsh:
-	unlink ~/.zshrc
+	@$(call unlink_if_file_exists,~/.zshrc)
 	ln -sv ~/dotfiles/zsh/.zshrc ~/.zshrc
 
 tmux:
-	unlink ~/.tmux_conf
+	@$(call unlink_if_file_exists,~/.tmux_conf)
 	ln -sv ./tmux/.tmux_conf ~/.tmux_conf
 
-starship:
-	unlink ~/.config/starship/starship.toml
-	ln -sv ./starship/starship.toml ~/.config/starship/starship.toml
-
+nvim:
+	@$(call unlink_if_file_exists,~/.config/nvim/init.vim)
+	ln -sv ~/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
