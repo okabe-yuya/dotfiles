@@ -42,6 +42,16 @@ call plug#begin()
     Plug 'Shougo/ddc-around'
 	Plug 'Shougo/ddc-matcher_head'
     Plug 'Shougo/ddc-ui-native'
+
+    " im-select manager
+    Plug 'keaising/im-select.nvim'
+
+    " rich status line
+    Plug 'nvim-lualine/lualine.nvim'
+    Plug 'nvim-tree/nvim-web-devicons'
+
+    " LSP pack
+    Plug 'sheerun/vim-polyglot' 
 call plug#end()
 
 " schema settings
