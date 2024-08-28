@@ -16,6 +16,9 @@ set winblend=10
 
 set number " 行番号を表示
 
+" Shift+pで改行して貼り付けを行う
+nnoremap P o<Esc>p
+
 " vim plug
 call plug#begin()
     Plug 'preservim/nerdtree'
