@@ -10,8 +10,8 @@ zsh:
 	ln -sv ~/dotfiles/zsh/.zshrc ~/.zshrc
 
 tmux:
-	@$(call unlink_if_file_exists,~/.tmux_conf)
-	ln -sv ./tmux/.tmux_conf ~/.tmux_conf
+	@$(call unlink_if_file_exists,~/.tmux.conf)
+	ln -sv ./dotfiles/tmux/.tmux.conf ~/.tmux.conf
 
 nvim:
 	@$(call unlink_if_file_exists,~/.config/nvim/init.vim)
