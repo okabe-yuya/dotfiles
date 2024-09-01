@@ -84,3 +84,6 @@ function peco-cdr() {
 zle -N peco-cdr
 bindkey '^T' peco-cdr
 
+# git commit時のエディターにneovimを使う
+export GIT_EDITOR=nvim
+
