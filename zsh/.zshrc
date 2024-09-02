@@ -87,3 +87,9 @@ bindkey '^T' peco-cdr
 # git commit時のエディターにneovimを使う
 export GIT_EDITOR=nvim
 
+# .zshrc.localファイルが存在していれば読み込ませる
+# 端末によって追加している環境変数などが異なる場合があるため、追加分は.zshrc.localで運用する
+if [ -f "$HOME/.zshrc.local" ]; then
+  source "$HOME/.zshrc.local"
+fi
+
