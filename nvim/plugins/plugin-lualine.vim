@@ -1,4 +1,4 @@
-lua << END
+lua << EOF
     require('lualine').setup()
-END
+EOF
 

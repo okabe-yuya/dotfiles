@@ -10,6 +10,9 @@ set hlsearch " Searchのハイライト
 set clipboard=unnamed " クリップボードへの登録
 syntax on " syntaxを有効
 
+" ファイルをデフォルトで右側に表示する
+set splitright
+
 " 背景透過
 set pumblend=10
 set winblend=10
@@ -55,6 +58,9 @@ call plug#begin()
 
     " LSP pack
     Plug 'sheerun/vim-polyglot' 
+    Plug 'williamboman/mason.nvim'
+    Plug 'williamboman/mason-lspconfig.nvim'
+    Plug 'neovim/nvim-lspconfig'
 call plug#end()
 
 " schema settings
