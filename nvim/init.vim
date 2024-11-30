@@ -24,24 +24,21 @@ nnoremap P o<Esc>p
 
 " vim plug
 call plug#begin()
+    " nerdtree: file window manager
     Plug 'preservim/nerdtree'
 
+    " telescope: fzf finder tool
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
-
-    " カラースキーマ
-    Plug 'cocopon/iceberg.vim'
-
-    " status line customizer
-    Plug 'nvim-lualine/lualine.nvim'
-    " If you want to have icons in your statusline choose one of these
-    Plug 'nvim-tree/nvim-web-devicons'
-     
-    Plug 'numToStr/Comment.nvim'
-
     Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
     Plug 'junegunn/fzf.vim'
-    
+ 
+    " iceberg: color schema(vim color theme)
+    Plug 'cocopon/iceberg.vim'
+
+    " Comment: easy comentout tool
+    Plug 'numToStr/Comment.nvim'
+
     " LSP
     Plug 'Shougo/ddc.vim'
     Plug 'vim-denops/denops.vim'
@@ -52,15 +49,11 @@ call plug#begin()
     " im-select manager
     Plug 'keaising/im-select.nvim'
 
-    " rich status line
-    Plug 'nvim-lualine/lualine.nvim'
-    Plug 'nvim-tree/nvim-web-devicons'
-
     " LSP pack
     Plug 'sheerun/vim-polyglot' 
 
-    Plug 'williamboman/mason.nvim'
-    Plug 'williamboman/mason-lspconfig.nvim'
+    " Plug 'williamboman/mason.nvim'
+    " Plug 'williamboman/mason-lspconfig.nvim'
     Plug 'neovim/nvim-lspconfig'
 
     Plug 'hrsh7th/nvim-cmp'
