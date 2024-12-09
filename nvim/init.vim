@@ -22,6 +22,9 @@ set number " 行番号を表示
 " Shift+pで改行して貼り付けを行う
 nnoremap P o<Esc>p
 
+" iterm2 + nvimで文字がちらつく事象の対応
+set ambiwidth=single
+
 " vim plug
 call plug#begin()
     " nerdtree: file window manager
