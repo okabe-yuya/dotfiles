@@ -25,6 +25,9 @@ nnoremap P o<Esc>p
 " iterm2 + nvimで文字がちらつく事象の対応
 set ambiwidth=single
 
+" 文字を折り返さない
+set nowrap
+
 " vim plug
 call plug#begin()
     " nerdtree: file window manager

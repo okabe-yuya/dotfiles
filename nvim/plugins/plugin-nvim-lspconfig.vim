@@ -74,5 +74,9 @@ lua << EOF
     nvim_lsp.rust_analyzer.setup{
         on_attach = on_attach,
     }
+    -- ★ LSP for Rust
+    nvim_lsp.ts_ls.setup{
+        on_attach = on_attach,
+    }
 EOF
 
