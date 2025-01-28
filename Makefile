@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim
+.PHONY: zsh tmux nvim git
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -16,6 +16,10 @@ tmux:
 nvim:
 	@$(call unlink_if_file_exists,~/.config/nvim/init.vim)
 	ln -sv ~/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
-
 	mkdir -p ~/.config/nvim/ftplugin
 	cp ~/dotfiles/nvim/ftplugin/* ~/.config/nvim/ftplugin/
+
+git:
+	@$(call unlink_if_file_exists,~/.gitconfig)
+	ln -sv ~/dotfiles/git/.gitconfig ~/.gitconfig
+

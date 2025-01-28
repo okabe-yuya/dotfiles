@@ -1,0 +1,8 @@
+[user]
+	name = okabe-yuya
+	email = takamizawa46@gmail.com
+[core]
+	autocrlf = input
+[push]
+	default = current
+
