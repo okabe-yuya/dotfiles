@@ -1,8 +1,11 @@
 " neovim config " 
 
+" ftpluginの有効化
+filetype plugin on
+
 set shell=/bin/zsh " コマンドの実行にはzshを使用する
 set shiftwidth=4 " indentの幅
-set tabstop=4 " タブに変換されるサイズ
+set tabstop=2 " タブに変換されるサイズ
 set expandtab " タブ入力の際にスペース
 set textwidth=0 " ワードラッピングなし
 set autoindent " 自動インデント
