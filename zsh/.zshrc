@@ -35,6 +35,9 @@ alias vi="nvim"
 alias vim="nvim"
 alias view="nvim -R"
 
+# git alias
+alias gpd="git pull origin develop"
+
 # history settings
 # ------------------------------------------
 # 直前と同じコマンドは履歴に追加しない
