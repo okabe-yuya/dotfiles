@@ -37,6 +37,8 @@ alias view="nvim -R"
 
 # git alias
 alias gpd="git pull origin develop"
+alias gsd="git switch develop"
+alias gmd="git merge develop"
 
 # history settings
 # ------------------------------------------
