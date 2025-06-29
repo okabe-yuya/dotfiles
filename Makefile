@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim git vscode-key-sync
+.PHONY: zsh tmux nvim git vscode vscode-key-sync
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -23,8 +23,12 @@ git:
 	@$(call unlink_if_file_exists,~/.gitconfig)
 	ln -sv ~/dotfiles/git/.gitconfig ~/.gitconfig
 
-# VSCode keybindings auto-sync Makefile
+vscode:
+	@$(call unlink_if_file_exists,~/.vscode/vscode-neovim/init.lua)
+	ln -sv ~/dotfiles/vscode/init.lua ~/.vscode/vscode-neovim/init.lua
 
+
+# VSCode keybindings auto-sync Makefile
 SRC = "$(HOME)/Library/Application Support/Code/User/keybindings.json"
 DEST = "$(HOME)/dotfiles/vscode/keybindings.json"
 GIT_DIR = "$(HOME)/dotfiles"

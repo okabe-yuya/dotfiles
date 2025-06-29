@@ -46,5 +46,10 @@
     "key": "shift+cmd+e",
     "command": "-workbench.view.explorer",
     "when": "viewContainer.workbench.view.explorer.enabled"
+  },
+  {
+    "key": "c",
+    "command": "-notebook.cell.copy",
+    "when": "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused"
   }
 ]
