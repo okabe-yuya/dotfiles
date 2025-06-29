@@ -92,6 +92,10 @@ bindkey '^T' peco-cdr
 # git commit時のエディターにneovimを使う
 export GIT_EDITOR=nvim
 
+# 画面上にゴミが残ってしまうことがあるため、設定
+export NVIM_TUI_ENABLE_TRUE_COLOR=1
+set termguicolors
+
 # .zshrc.localファイルが存在していれば読み込ませる
 # 端末によって追加している環境変数などが異なる場合があるため、追加分は.zshrc.localで運用する
 if [ -f "$HOME/.zshrc.local" ]; then

@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim git
+.PHONY: zsh tmux nvim git vscode-key-sync
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -23,3 +23,25 @@ git:
 	@$(call unlink_if_file_exists,~/.gitconfig)
 	ln -sv ~/dotfiles/git/.gitconfig ~/.gitconfig
 
+# VSCode keybindings auto-sync Makefile
+
+SRC = "$(HOME)/Library/Application Support/Code/User/keybindings.json"
+DEST = "$(HOME)/dotfiles/vscode/keybindings.json"
+GIT_DIR = "$(HOME)/dotfiles"
+COMMIT_MSG = "Update keybindings.json from VSCode at $(shell date '+%Y-%m-%d %H:%M:%S')"
+
+vscode-key-sync:
+	@cp -f $(SRC) $(DEST) 2>/dev/null || true
+	@read -p "📝 Commit and push changes? (y/n): " confirm; \
+	if [ "$$confirm" = "y" ]; then \
+		cd $(GIT_DIR) && \
+		git add $(DEST); \
+		if git diff --cached --quiet; then \
+			echo "⚠️ Nothing to commit"; \
+			exit 0; \
+		fi; \
+		git commit -m $(COMMIT_MSG); \
+		git push && echo "🚀 Changes committed and pushed!"; \
+	else \
+		echo "❌ Commit/push canceled."; \
+	fi

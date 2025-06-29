@@ -4,7 +4,7 @@
 filetype plugin on
 
 set shell=/bin/zsh " コマンドの実行にはzshを使用する
-set shiftwidth=4 " indentの幅
+set shiftwidth=2 " indentの幅
 set tabstop=2 " タブに変換されるサイズ
 set expandtab " タブ入力の際にスペース
 set textwidth=0 " ワードラッピングなし
