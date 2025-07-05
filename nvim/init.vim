@@ -1,4 +1,6 @@
-" neovim config " 
+" ------------------------------------
+"  . *. . Neovim config  . *. .
+" ------------------------------------
 
 " ftpluginの有効化
 filetype plugin on
@@ -33,17 +35,20 @@ set nowrap
 
 " vim plug
 call plug#begin()
-    " nerdtree: file window manager
-    Plug 'preservim/nerdtree'
+    " A File Explorer For Neovim
+    Plug 'nvim-tree/nvim-tree.lua'
 
+    " nerdtree: file window manager
+    " Plug 'preservim/nerdtree'
+    
     " telescope: fzf finder tool
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
     Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
     Plug 'junegunn/fzf.vim'
  
-    " iceberg: color schema(vim color theme)
-    Plug 'cocopon/iceberg.vim'
+    " schema(vim color theme)
+    Plug 'rebelot/kanagawa.nvim'
 
     " Comment: easy comentout tool
     Plug 'numToStr/Comment.nvim'
@@ -52,7 +57,7 @@ call plug#begin()
     Plug 'Shougo/ddc.vim'
     Plug 'vim-denops/denops.vim'
     Plug 'Shougo/ddc-around'
-	Plug 'Shougo/ddc-matcher_head'
+    Plug 'Shougo/ddc-matcher_head'
     Plug 'Shougo/ddc-ui-native'
 
     " im-select manager
@@ -73,7 +78,37 @@ call plug#end()
 " schema settings
 source ~/dotfiles/nvim/color-scheme.vim
 
-" load plugins
+" 背景の透過設定
+" ターミナルの透過設定をnvimにも反映させる
+set laststatus=3
+" 基本UI
+highlight Normal guibg=NONE ctermbg=NONE
+highlight NormalNC guibg=NONE ctermbg=NONE
+highlight EndOfBuffer guibg=NONE ctermbg=NONE
+
+" 行番号・記号
+highlight LineNr guibg=NONE ctermbg=NONE
+highlight CursorLineNr guibg=NONE ctermbg=NONE
+highlight SignColumn guibg=NONE ctermbg=NONE
+highlight FoldColumn guibg=NONE ctermbg=NONE
+
+" ステータスライン周辺
+highlight VertSplit guibg=NONE ctermbg=NONE
+highlight WinSeparator guibg=NONE ctermbg=NONE
+highlight StatusLine guibg=NONE ctermbg=NONE blend=100
+highlight StatusLineNC guibg=NONE ctermbg=NONE blend=100
+
+" コマンドライン／メッセージ領域
+highlight MsgArea guibg=NONE ctermbg=NONE
+highlight MsgSeparator guibg=NONE ctermbg=NONE
+highlight CommandLine guibg=NONE ctermbg=NONE
+highlight ModeMsg guibg=NONE ctermbg=NONE
+highlight MoreMsg guibg=NONE ctermbg=NONE
+highlight ErrorMsg guibg=NONE ctermbg=NONE
+highlight WarningMsg guibg=NONE ctermbg=NONE
+highlight WildMenu guibg=NONE ctermbg=NONE
+
+" プラグイン設定の読み込み
 for fpath in globpath('~/dotfiles/nvim/plugins', '*.vim', 0, 1)
     execute 'source' fpath
 endfor
