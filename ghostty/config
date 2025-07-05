@@ -1,0 +1,25 @@
+# 👻 This is the configuration file for Ghostty.
+
+# Theme Settings
+theme = iceberg-dark
+
+# Window Settings
+macos-titlebar-style = "transparent"
+window-padding-x = 20
+window-padding-y = 5
+window-padding-balance = true
+window-theme = ghostty
+background-opacity = 0.65
+background-blur-radius = 20
+background-blur = false
+
+# TERM
+term = "xterm-256color"
+
+# Keybind Settings
+# Hotkey (Open Ghostty window rapidly)
+quick-terminal-position = "center"
+quick-terminal-screen = "main"
+quick-terminal-animation-duration = 0.3
+keybind = "global:f12=toggle_quick_terminal"
+
