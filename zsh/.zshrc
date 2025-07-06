@@ -102,3 +102,6 @@ if [ -f "$HOME/.zshrc.local" ]; then
   source "$HOME/.zshrc.local"
 fi
 
+# for tmuxinator editor
+export EDITOR='nvim'
+
