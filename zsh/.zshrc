@@ -39,6 +39,8 @@ alias view="nvim -R"
 alias gpd="git pull origin develop"
 alias gsd="git switch develop"
 alias gmd="git merge develop"
+alias gsp='git switch `git branch | peco | sed -e "s/*//g"`'
+alias gpc='git pull origin $(git rev-parse --abbrev-ref HEAD)'
 
 # history settings
 # ------------------------------------------
