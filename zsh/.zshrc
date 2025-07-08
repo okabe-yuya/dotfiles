@@ -107,3 +107,10 @@ fi
 # for tmuxinator editor
 export EDITOR='nvim'
 
+# なぜかM3 Macのtmux上ではcmd+p,nが効かないため、明示的に設定
+CPU_BRAND=$(sysctl -n machdep.cpu.brand_string)
+if [[ "$CPU_BRAND" == *"Apple M3"* ]]; then
+  bindkey '^P' up-line-or-history    # Ctrl + P → 前の履歴
+  bindkey '^N' down-line-or-history  # Ctrl + N → 次の履歴
+fi
+
