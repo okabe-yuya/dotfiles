@@ -3,6 +3,16 @@
 # Theme Settings
 theme = iceberg-dark
 
+# Font Settings
+font-family = JetBrainsMonoNL Nerd Font Mono
+font-feature = -dlig
+
+font-style-bold = false
+font-style-italic = false
+font-style-bold-italic = false
+
+font-size = 15
+
 # Window Settings
 macos-titlebar-style = "transparent"
 window-padding-x = 20
@@ -12,8 +22,6 @@ window-theme = ghostty
 background-opacity = 0.75
 background-blur-radius = 20
 background-blur = false
-
-font-size = 14
 
 # TERM
 term = "xterm-256color"
