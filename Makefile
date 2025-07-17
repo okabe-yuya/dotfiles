@@ -14,8 +14,8 @@ tmux:
 	ln -sv ./dotfiles/tmux/.tmux.conf ~/.tmux.conf
 
 nvim:
-	@$(call unlink_if_file_exists,~/.config/nvim/init.vim)
-	ln -sv ~/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
+	@$(call unlink_if_file_exists,~/.config/nvim/init.lua)
+	ln -sv ~/dotfiles/nvim/init.lua ~/.config/nvim/init.lua
 	mkdir -p ~/.config/nvim/ftplugin
 	cp ~/dotfiles/nvim/ftplugin/* ~/.config/nvim/ftplugin/
 

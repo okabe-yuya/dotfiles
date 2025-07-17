@@ -1,7 +1,6 @@
-nnoremap <C-p> <cmd>Telescope find_files<cr>
-nnoremap <C-g> <cmd>Telescope live_grep<cr>
+local M = {}
 
-lua << EOF
+function M.setup()
   local telescope = require 'telescope'
 
   telescope.setup {
@@ -9,5 +8,6 @@ lua << EOF
       winblend = 100,
     },
   }
-EOF
+end
 
+return M
