@@ -18,6 +18,8 @@ nvim:
 	ln -sv ~/dotfiles/nvim/init.lua ~/.config/nvim/init.lua
 	mkdir -p ~/.config/nvim/ftplugin
 	cp ~/dotfiles/nvim/ftplugin/* ~/.config/nvim/ftplugin/
+	mkdir -p ~/.config/nvim/lua
+	cp -r ~/dotfiles/nvim/lua/* ~/.config/nvim/lua/
 
 git:
 	@$(call unlink_if_file_exists,~/.gitconfig)
