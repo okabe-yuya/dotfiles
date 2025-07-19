@@ -18,6 +18,7 @@ nvim:
 	ln -sv ~/dotfiles/nvim/init.lua ~/.config/nvim/init.lua
 	mkdir -p ~/.config/nvim/ftplugin
 	cp ~/dotfiles/nvim/ftplugin/* ~/.config/nvim/ftplugin/
+	rm -rf ~/.config/nvim/lua
 	mkdir -p ~/.config/nvim/lua
 	cp -r ~/dotfiles/nvim/lua/* ~/.config/nvim/lua/
 

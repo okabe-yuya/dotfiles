@@ -1,11 +1,9 @@
 -- ------------------------------------
 --  . *. . Plugin settings  . *. .
 -- ------------------------------------
--- 読み込みパスの拡張
--- package.path = package.path .. ";" .. vim.fn.expand("~/dotfiles/nvim/lua/?.lua")
-
 -- プラグイン設定の読み込み
 require("config.lazy") -- lazy.nvimの設定
+
 
 -- ------------------------------------
 --  . *. . Command config  . *. .
