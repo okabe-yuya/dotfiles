@@ -1,4 +1,5 @@
 return {
   "rebelot/kanagawa.nvim",
-  lazy = true
+  lazy = true,
+  transparent = true,
 }

@@ -4,13 +4,10 @@ return {
   lazy = true,
   keys = {
     { "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Find files with Telescope" },
-    { "<C-g>", "<cmd>Telescope live_grep<cr>", desc = "Live grep with Telescope" },
+    { "<C-g>", "<cmd>Telescope live_grep<cr>",  desc = "Live grep with Telescope" },
+    { "<C-q>", "<cmd>Telescope buffers<cr>",    desc = "Find buffers with Telescope" },
   },
-  config = function()
-    require("telescope").setup({
-      defaults = {
-        winblend = 100, -- 背景透過
-      },
-    })
-  end,
+  opts = {
+    defaults = {},
+  }
 }

@@ -20,6 +20,14 @@ vim.cmd("syntax on")
 -- Shift+pで改行して貼り付けを行う
 vim.api.nvim_set_keymap('n', 'P', 'o<Esc>p', { noremap = true, silent = true })
 
+-- 画面分割
+vim.api.nvim_set_keymap('n', 'sv', ':vsplit<Return><C-w>w', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'ss', ':split<Return><C-w>w', { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap('n', 'sh', '<C-w>h', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'sk', '<C-w>k', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'sj', '<C-w>j', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'sl', '<C-w>l', { noremap = true, silent = true })
 
 -- ------------------------------------
 --  . *. . Option settings  . *. .
@@ -71,53 +79,43 @@ vim.opt.laststatus = 3
 -- ------------------------------------
 --  . *. . UI settings  . *. .
 -- ------------------------------------
--- color schema設定の読み込み
 vim.opt.termguicolors = true
+vim.opt.winblend = 0 -- ウィンドウの不透明度
+vim.opt.pumblend = 0 -- ポップアップメニューの不透明度
 
-vim.cmd([[colorscheme kanagawa]])
+vim.cmd [[
+  colorscheme kanagawa
 
--- ビジュアルモードの選択時の色の設定
--- 背景透過をしていると、選択している箇所の判別がつかないため設定
-vim.cmd([[highlight Visual ctermbg=darkgrey guibg=#5f5f5f]])
+  " ビジュアルモードの選択時の色の設定
+  " 背景透過をしていると、選択している箇所の判別がつかないため設定
+  highlight Visual ctermbg=darkgrey guibg=#5f5f5f
 
--- lightline
-vim.g.lightline = {}
-vim.g.lightline.colorscheme = 'kanagawa'
+  highlight StatusLine guibg=default guifg=default " status line
+  highlight LineNr guibg=default guifg=default " 行番号
+  highlight SignColumn guibg=default
 
--- disable netrw at the very start of your init.lua
+  " LSP診断サインの背景色も透明に（default背景利用）
+  highlight DiagnosticSignWarn  guibg=none
+  highlight DiagnosticSignError guibg=none
+  highlight DiagnosticSignInfo  guibg=none
+  highlight DiagnosticSignHint  guibg=none
+
+  " GitSignsプラグイン用のサイン背景もnoneに
+  highlight GitSignsAdd    guibg=none
+  highlight GitSignsChange guibg=none
+  highlight GitSignsDelete guibg=none
+
+  " Telescope
+  highlight TelescopeBorder guibg=NONE guifg=NONE
+  highlight TelescopePromptBorder guibg=NONE guifg=NONE
+  highlight TelescopeResultsBorder guibg=NONE guifg=NONE
+  highlight TelescopePreviewBorder guibg=NONE guifg=NONE
+
+  " Tabline
+  highlight BufferTabpageFill guibg=default
+  highlight TabLineFill guibg=NONE ctermbg=NONE
+]]
+
+-- disable netrw(default file browser) at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-
--- optionally enable 24-bit colour
-vim.opt.termguicolors = true
-
----- 背景の透過設定
--- ターミナルの透過設定をnvimにも反映させる
-local highlights = {
-  "Normal", "NormalNC", "EndOfBuffer",
-
-  -- 行番号・記号
-  "LineNr", "CursorLineNr", "SignColumn", "FoldColumn",
-
-  -- ステータスライン周辺
-  "VertSplit", "WinSeparator", "StatusLine", "StatusLineNC",
-
-  -- コマンドライン／メッセージ領域
-  "MsgArea", "MsgSeparator", "CommandLine", "ModeMsg",
-  "MoreMsg", "ErrorMsg", "WarningMsg", "WildMenu"
-}
-
-for _, group in ipairs(highlights) do
-  vim.cmd("highlight " .. group .. " guibg=NONE ctermbg=NONE")
-end
-
--- ステータスラインのblend
-vim.cmd("highlight StatusLine blend=100")
-vim.cmd("highlight StatusLineNC blend=100")
-
--- Error
-vim.o.updatetime = 300 -- カーソルが止まった後にエラー表示されるまでの時間(ms)
-
-vim.cmd([[
-  autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
-]])
