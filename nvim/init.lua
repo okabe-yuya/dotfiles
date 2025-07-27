@@ -66,6 +66,9 @@ vim.opt.winblend = 10
 -- 行番号を表示
 vim.opt.number = true
 
+-- signcolumnを常に表示して幅1に固定
+vim.o.signcolumn = "yes:1"
+
 -- iterm2 + nvimで文字がちらつく事象の対応
 vim.opt.ambiwidth = "single"
 

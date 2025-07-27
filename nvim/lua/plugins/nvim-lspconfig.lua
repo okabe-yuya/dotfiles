@@ -13,12 +13,6 @@ return {
     end
 
     vim.lsp.enable(servers)
-
-    -- Error表示
-    vim.o.updatetime = 300 -- カーソルが止まった後にエラー表示されるまでの時間(ms)
-    vim.cmd([[
-      autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
-    ]])
   end,
   event = { "BufReadPre", "BufNewFile" }, -- ファイルを開いたときに読み込む
 }

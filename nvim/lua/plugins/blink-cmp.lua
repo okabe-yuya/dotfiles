@@ -1,9 +1,9 @@
-vim.g.barbar_auto_setup = false
-
 return {
   "saghen/blink.cmp",
   version = "*",
-  dependencies = { "rafamadriz/friendly-snippets" },
+  dependencies = {
+    { "rafamadriz/friendly-snippets" }, -- 事前定義されたスニペットコレクション
+  },
   lazy = true,
   opts = {
     keymap = { preset = "super-tab" },
