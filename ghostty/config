@@ -5,6 +5,7 @@ theme = Kanagawa Wave
 
 # Font Settings
 font-family = JetBrainsMonoNL Nerd Font Mono
+font-feature = -calt
 font-feature = -dlig
 
 font-style-bold = false
