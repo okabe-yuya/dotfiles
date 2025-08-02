@@ -1,14 +1,15 @@
 return {
   "saghen/blink.cmp",
   version = "*",
-  dependencies = {
-    { "rafamadriz/friendly-snippets" }, -- 事前定義されたスニペットコレクション
-  },
+  dependencies = { 'L3MON4D3/LuaSnip', version = 'v2.*' },
   lazy = true,
   opts = {
     keymap = { preset = "super-tab" },
     appearance = {
       nerd_font_variant = "mono",
+    },
+    snippets = {
+      preset = 'luasnip'
     },
     completion = {
       documentation = { auto_show = false },

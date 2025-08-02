@@ -3,8 +3,8 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons" },
   lazy = true,
   keys = {
-    { "<C-n>", "<cmd>NvimTreeToggle<CR>", desc = "Toggle NvimTree" },
-    { "<C-h>", "<cmd>NvimTreeFocus<CR>", desc = "Focus NvimTree" },
+    { "<C-n>", "<cmd>NvimTreeToggle<CR>",   desc = "Toggle NvimTree" },
+    { "<C-h>", "<cmd>NvimTreeFocus<CR>",    desc = "Focus NvimTree" },
     { "<C-f>", "<cmd>NvimTreeFindFile<CR>", desc = "Find file in NvimTree" },
   },
   config = function()
@@ -21,6 +21,9 @@ return {
       },
       filters = {
         dotfiles = false,
+      },
+      update_focused_file = {
+        enable = true,
       },
       git = {
         enable = false,
