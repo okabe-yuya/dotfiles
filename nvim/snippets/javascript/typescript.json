@@ -1,8 +1,0 @@
-{
-  "interface definition": {
-    "prefix": "inter",
-    "body": [
-      "interface ${1:name} {", "\t$0", "}"
-    ]
-  }
-}

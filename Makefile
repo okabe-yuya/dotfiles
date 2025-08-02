@@ -21,6 +21,10 @@ nvim:
 	rm -rf ~/.config/nvim/lua
 	mkdir -p ~/.config/nvim/lua
 	cp -r ~/dotfiles/nvim/lua/* ~/.config/nvim/lua/
+	rm -rf ~/.config/nvim/luasnippets
+	mkdir -p ~/.config/nvim/luasnippets
+	cp -r ~/dotfiles/nvim/luasnippets/* ~/.config/nvim/luasnippets/
+
 
 git:
 	@$(call unlink_if_file_exists,~/.gitconfig)

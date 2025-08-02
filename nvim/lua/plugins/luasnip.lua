@@ -6,9 +6,7 @@ return {
   config = function()
     require("luasnip.loaders.from_vscode").lazy_load()
 
-    -- Load custom snippets with expanded home directory
-    require("luasnip.loaders.from_vscode").lazy_load({
-      paths = { "./snippets" }
-    })
+    -- Load custom snippets
+    require("luasnip.loaders.from_lua").load()
   end,
 }
