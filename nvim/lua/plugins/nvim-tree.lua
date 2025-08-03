@@ -30,6 +30,9 @@ return {
       },
     })
 
+    -- 境界線の色を指定
+    vim.api.nvim_set_hl(0, "NvimTreeWinSeparator", { fg = "#464646" })
+
     -- ファイル引数なしでNeovim起動したらnvim-treeを開く
     -- nvim-tree以外のバッファが1つだけで、かつそのバッファがnvim-treeならNeovimを終了する自動コマンド
     vim.api.nvim_create_autocmd("BufEnter", {

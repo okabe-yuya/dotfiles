@@ -1,7 +1,7 @@
 # 👻 This is the configuration file for Ghostty.
 
 # Theme Settings
-theme = Kanagawa Wave
+theme = tokyonight_night
 
 # Font Settings
 font-family = JetBrainsMonoNL Nerd Font Mono

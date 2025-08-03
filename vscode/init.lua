@@ -1,16 +1,16 @@
 -- インデント関連
-vim.opt.shiftwidth = 2      -- 自動インデント幅
-vim.opt.tabstop = 2         -- タブ表示幅
-vim.opt.expandtab = true    -- タブ入力をスペースに変換
-vim.opt.autoindent = true   -- 自動インデント
+vim.opt.shiftwidth = 2    -- 自動インデント幅
+vim.opt.tabstop = 2       -- タブ表示幅
+vim.opt.expandtab = true  -- タブ入力をスペースに変換
+vim.opt.autoindent = true -- 自動インデント
 
 -- テキスト幅と折り返し
-vim.opt.textwidth = 0       -- 自動折り返しなし
-vim.opt.wrap = false        -- 画面折り返しなし
+vim.opt.textwidth = 0 -- 自動折り返しなし
+vim.opt.wrap = false  -- 画面折り返しなし
 
 -- ハイライトと行番号
-vim.opt.hlsearch = true     -- 検索ハイライト
-vim.opt.number = true       -- 行番号表示
+vim.opt.hlsearch = true -- 検索ハイライト
+vim.opt.number = true   -- 行番号表示
 
 -- クリップボード連携（macOSの場合は"unnamedplus"が主流）
 vim.opt.clipboard = "unnamed"
@@ -22,8 +22,8 @@ vim.cmd("syntax on")
 vim.opt.splitright = true
 
 -- ポップアップ・ウィンドウの背景透過設定
-vim.opt.pumblend = 10       -- ポップアップメニューの透過
-vim.opt.winblend = 10       -- 通常ウィンドウの透過
+vim.opt.pumblend = 10 -- ポップアップメニューの透過
+vim.opt.winblend = 10 -- 通常ウィンドウの透過
 
 -- 文字列の一括置換
 -- https://zenn.dev/vim_jp/articles/2023-06-30-vim-substitute-tips
@@ -56,4 +56,3 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 
 vim.opt.rtp:prepend(lazypath)
-

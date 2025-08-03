@@ -78,6 +78,8 @@ vim.opt.wrap = false
 -- 常にステータスラインを1つだけ表示する
 vim.opt.laststatus = 3
 
+-- 空行に何も表示しない
+vim.opt.fillchars:append({ eob = " " })
 
 -- ------------------------------------
 --  . *. . UI settings  . *. .
@@ -86,38 +88,12 @@ vim.opt.termguicolors = true
 vim.opt.winblend = 0 -- ウィンドウの不透明度
 vim.opt.pumblend = 0 -- ポップアップメニューの不透明度
 
-vim.cmd [[
-  colorscheme kanagawa
+-- カラースキーマの登録
+vim.cmd [[colorscheme tokyonight-night]]
 
-  " ビジュアルモードの選択時の色の設定
-  " 背景透過をしていると、選択している箇所の判別がつかないため設定
-  highlight Visual ctermbg=darkgrey guibg=#5f5f5f
-
-  highlight StatusLine guibg=default guifg=default " status line
-  highlight LineNr guibg=default guifg=default " 行番号
-  highlight SignColumn guibg=default
-
-  " LSP診断サインの背景色も透明に（default背景利用）
-  highlight DiagnosticSignWarn  guibg=none
-  highlight DiagnosticSignError guibg=none
-  highlight DiagnosticSignInfo  guibg=none
-  highlight DiagnosticSignHint  guibg=none
-
-  " GitSignsプラグイン用のサイン背景もnoneに
-  highlight GitSignsAdd    guibg=none
-  highlight GitSignsChange guibg=none
-  highlight GitSignsDelete guibg=none
-
-  " Telescope
-  highlight TelescopeBorder guibg=NONE guifg=NONE
-  highlight TelescopePromptBorder guibg=NONE guifg=NONE
-  highlight TelescopeResultsBorder guibg=NONE guifg=NONE
-  highlight TelescopePreviewBorder guibg=NONE guifg=NONE
-
-  " Tabline
-  highlight BufferTabpageFill guibg=default
-  highlight TabLineFill guibg=NONE ctermbg=NONE
-]]
+-- ビジュアルモードの選択時の色の設定
+-- 背景透過をしていると、選択している箇所の判別がつかないため設定
+vim.api.nvim_set_hl(0, "Visual", { bg = "#5f5f5f" })
 
 -- disable netrw(default file browser) at the very start of your init.lua
 vim.g.loaded_netrw = 1
