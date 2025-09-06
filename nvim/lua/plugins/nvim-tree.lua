@@ -21,6 +21,9 @@ return {
       },
       filters = {
         dotfiles = false,
+        custom = {
+          "^node_modules",
+        },
       },
       update_focused_file = {
         enable = true,
