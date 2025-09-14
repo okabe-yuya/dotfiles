@@ -1,25 +1,47 @@
 return {
   "nvim-treesitter/nvim-treesitter",
+  event = "VeryLazy",
   build = ":TSUpdate",
-  config = function()
-    local configs = require("nvim-treesitter.configs")
-
-    configs.setup({
-      ensure_installed = {
-        "tsx",
-        "toml",
-        "fish",
-        "php",
-        "json",
-        "yaml",
-        "swift",
-        "css",
-        "html",
-        "lua"
-      },
-      sync_install = false,
-      highlight = { enable = true },
-      indent = { enable = true },
-    })
+  main = "nvim-treesitter.configs",
+  opts = {
+    ensure_installed = {
+      "javascript",
+      "typescript",
+      "tsx",
+      "css",
+      "html",
+      "json",
+      "yaml",
+      "lua",
+      "bash",
+      "markdown",
+      "toml",
+      "vim",
+      "elixir",
+      "csv",
+      "graphql",
+      "gotmpl",
+      "sql",
+      "ruby",
+    }
+  },
+  additional_vim_regex_highlighting = false,
+  highlight = { enable = false },
+  textsubjects = {
+    enable = true,
+    prev_selection = ',',
+    keymaps = {
+      ['.'] = 'textsubjects-smart',
+      [';'] = 'textsubjects-container-outer',
+      ['i;'] = 'textsubjects-container-inner',
+    },
+  },
+  init = function()
+    vim.uv.new_timer():start(300, 0, vim.schedule_wrap(function()
+      vim.cmd 'TSEnable highlight'
+    end))
   end,
+  dependencies = {
+    'RRethy/nvim-treesitter-textsubjects',
+  },
 }

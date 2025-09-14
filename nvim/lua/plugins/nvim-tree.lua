@@ -7,6 +7,11 @@ return {
     { "<C-h>", "<cmd>NvimTreeFocus<CR>",    desc = "Focus NvimTree" },
     { "<C-f>", "<cmd>NvimTreeFindFile<CR>", desc = "Find file in NvimTree" },
   },
+  init = function()
+    -- Neovimの組み込みファイルエクスプローラーを無効にする
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+  end,
   config = function()
     require("nvim-tree").setup({
       sort = {
@@ -14,6 +19,7 @@ return {
       },
       view = {
         width = 30,
+        signcolumn = "no",
       },
       renderer = {
         group_empty = true,
@@ -31,26 +37,6 @@ return {
       git = {
         enable = false,
       },
-    })
-
-    -- 境界線の色を指定
-    vim.api.nvim_set_hl(0, "NvimTreeWinSeparator", { fg = "#464646" })
-
-    -- ファイル引数なしでNeovim起動したらnvim-treeを開く
-    -- nvim-tree以外のバッファが1つだけで、かつそのバッファがnvim-treeならNeovimを終了する自動コマンド
-    vim.api.nvim_create_autocmd("BufEnter", {
-      callback = function()
-        local api = require("nvim-tree.api")
-        local tab_wins = vim.api.nvim_tabpage_list_wins(0)
-
-        if #tab_wins == 1 then
-          local buf = vim.api.nvim_win_get_buf(tab_wins[1])
-          local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-          if ft == "NvimTree" then
-            vim.cmd("quit")
-          end
-        end
-      end,
     })
   end,
 }

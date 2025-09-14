@@ -14,17 +14,7 @@ tmux:
 	ln -sv ./dotfiles/tmux/.tmux.conf ~/.tmux.conf
 
 nvim:
-	@$(call unlink_if_file_exists,~/.config/nvim/init.lua)
-	ln -sv ~/dotfiles/nvim/init.lua ~/.config/nvim/init.lua
-	mkdir -p ~/.config/nvim/ftplugin
-	cp ~/dotfiles/nvim/ftplugin/* ~/.config/nvim/ftplugin/
-	rm -rf ~/.config/nvim/lua
-	mkdir -p ~/.config/nvim/lua
-	cp -r ~/dotfiles/nvim/lua/* ~/.config/nvim/lua/
-	rm -rf ~/.config/nvim/luasnippets
-	mkdir -p ~/.config/nvim/luasnippets
-	cp -r ~/dotfiles/nvim/luasnippets/* ~/.config/nvim/luasnippets/
-
+	scripts/make-nvim.sh
 
 git:
 	@$(call unlink_if_file_exists,~/.gitconfig)
