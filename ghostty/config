@@ -1,7 +1,7 @@
 # 👻 This is the configuration file for Ghostty.
 
 # Theme Settings
-theme = tokyonight_night
+# theme = NvimDark
 
 # Font Settings
 font-family = JetBrainsMonoNL Nerd Font Mono
@@ -22,7 +22,7 @@ window-padding-balance = true
 window-theme = ghostty
 # background-blur-radius = 20
 # background-blur = false
-background-opacity = 0.9
+# background-opacity = 0.9
 
 macos-titlebar-style = native
 
