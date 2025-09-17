@@ -49,10 +49,13 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 
 -- signcolumnを常に表示して幅1に固定
-vim.o.signcolumn = "yes:1"
+-- vim.o.signcolumn = "yes:3"
 
 -- iterm2 + nvimで文字がちらつく事象の対応
 vim.opt.ambiwidth = "single"
+
+-- optionally enable 24-bit colour
+vim.opt.termguicolors = true
 
 -- 文字を折り返さない
 vim.opt.wrap = false
@@ -60,7 +63,23 @@ vim.opt.wrap = false
 -- エラー時のビープ音をミュート
 vim.opt.visualbell = true
 
+-- コメントの連続入力をブロック
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "*",
+  callback = function()
+    local opt = vim.opt_local
+    opt.formatoptions:remove({ 'c', 'r', 'o' })
+  end,
+})
+
 -- カーソル行のエラーを表示
 vim.diagnostic.config({
   virtual_text = { current_line = true }
 })
+
+-- ウィンドウ境界線を非表示
+vim.api.nvim_set_hl(0, "WinSeparator", { bg = "none" })
+vim.opt.fillchars:append {
+  vert = ' ',
+  horiz = ' ',
+}

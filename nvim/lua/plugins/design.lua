@@ -12,9 +12,15 @@ return {
 
   -- color scheme
   {
-    'Mofiqul/vscode.nvim',
-    lazy = false,
-    priority = 1000,
+    "navarasu/onedark.nvim",
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('onedark').setup {
+        style = 'darker'
+      }
+      -- Enable theme
+      require('onedark').load()
+    end
   },
 
   -- status line
@@ -22,19 +28,41 @@ return {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
+      -- デフォルトのステータスラインは非表示に
+      vim.opt.showmode = false
+
       require('lualine').setup {
         options = {
-          theme = 'dracula',
+          theme = 'onedark',
           disabled_filetypes = {
             statusline = { "NvimTree" },
+            winbar = { 'NvimTree' },
           },
+          globalstatus = true,
         },
         sections = {
           lualine_x = {},
           lualine_y = {},
           lualine_z = {},
-        }
+        },
       }
     end
-  }
+  },
+
+  -- command line
+  -- {
+  --   "folke/noice.nvim",
+  --   event = "VeryLazy",
+  --   opts = {
+  --     -- add any options here
+  --   },
+  --   dependencies = {
+  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+  --     "MunifTanjim/nui.nvim",
+  --     -- OPTIONAL:
+  --     --   `nvim-notify` is only needed, if you want to use the notification view.
+  --     --   If not available, we use `mini` as the fallback
+  --     -- "rcarriga/nvim-notify",
+  --   }
+  -- }
 }

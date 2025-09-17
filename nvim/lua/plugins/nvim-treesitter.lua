@@ -26,7 +26,7 @@ return {
     }
   },
   additional_vim_regex_highlighting = false,
-  highlight = { enable = false },
+  highlight = { enable = true },
   textsubjects = {
     enable = true,
     prev_selection = ',',

@@ -4,6 +4,8 @@
 local lsp_servers = {
   "lua_ls",
   "ts_ls",
+  "ruby_lsp",
+  "jsonls",
 }
 
 vim.lsp.enable(lsp_servers)

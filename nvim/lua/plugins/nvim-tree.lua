@@ -19,7 +19,7 @@ return {
       },
       view = {
         width = 30,
-        signcolumn = "no",
+        signcolumn = 'no',
       },
       renderer = {
         group_empty = true,
