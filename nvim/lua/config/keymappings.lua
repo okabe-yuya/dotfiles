@@ -30,3 +30,6 @@ keymap('n', 'J', 'gJ')
 
 -- <leader>sでファイル保存
 keymap('n', '<C-s>', ':<C-u>w<CR>')
+
+-- Ctrl + e で esc を押したのと同じ扱いにする
+vim.keymap.set({ 'n', 'i', 'v' }, '<C-e>', '<Esc>', { noremap = true, silent = true })
