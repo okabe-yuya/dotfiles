@@ -1,3 +1,5 @@
+-- telescope で検索結果から複数ファイルを開けるようにする
+-- https://github.com/nvim-telescope/telescope.nvim/issues/1048#issuecomment-1679797700
 local select_one_or_multi = function(prompt_bufnr)
   local picker = require('telescope.actions.state').get_current_picker(prompt_bufnr)
   local multi = picker:get_multi_selection()
