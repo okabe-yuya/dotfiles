@@ -48,9 +48,6 @@ vim.opt.splitright = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 
--- signcolumnを常に表示して幅1に固定
--- vim.o.signcolumn = "yes:3"
-
 -- iterm2 + nvimで文字がちらつく事象の対応
 vim.opt.ambiwidth = "single"
 
