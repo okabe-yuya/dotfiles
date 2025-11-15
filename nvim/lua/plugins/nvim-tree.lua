@@ -7,18 +7,20 @@ return {
     { "<C-h>", "<cmd>NvimTreeFocus<CR>",    desc = "Focus NvimTree" },
     { "<C-f>", "<cmd>NvimTreeFindFile<CR>", desc = "Find file in NvimTree" },
   },
+
   init = function()
     -- Neovimの組み込みファイルエクスプローラーを無効にする
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
   end,
+
   config = function()
     require("nvim-tree").setup({
       sort = {
         sorter = "case_sensitive",
       },
       view = {
-        width = 40,
+        width = 35,
         signcolumn = 'no',
       },
       renderer = {

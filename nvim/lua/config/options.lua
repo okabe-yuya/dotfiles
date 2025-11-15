@@ -73,10 +73,3 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.diagnostic.config({
   virtual_text = { current_line = true }
 })
-
--- ウィンドウ境界線を非表示
-vim.api.nvim_set_hl(0, "WinSeparator", { bg = "none" })
-vim.opt.fillchars:append {
-  vert = ' ',
-  horiz = ' ',
-}
