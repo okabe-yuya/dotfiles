@@ -15,6 +15,11 @@ local select_one_or_multi = function(prompt_bufnr)
   end
 end
 
+local close_window = function(prompt_bufnr)
+  local actions = require('telescope.actions')
+  actions.close(prompt_bufnr)
+end
+
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },
@@ -31,7 +36,11 @@ return {
     defaults = {
       mappings = {
         i = {
+          -- TABで複数選択したファイルをバッファにまとめて読み込む
           ['<CR>'] = select_one_or_multi,
+
+          -- INSERTモードでもescを押したらウィンドウを閉じる
+          ['<esc>'] = close_window,
         }
       },
       file_ignore_patterns = {
