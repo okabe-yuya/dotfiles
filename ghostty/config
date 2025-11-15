@@ -1,7 +1,7 @@
 # 👻 This is the configuration file for Ghostty.
 
 # Theme Settings
-# theme = NvimDark
+theme = Rose Pine
 
 # Font Settings
 font-family = JetBrainsMonoNL Nerd Font Mono
