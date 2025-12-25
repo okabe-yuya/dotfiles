@@ -83,3 +83,27 @@ vim.opt.fillchars:append {
 
 -- code action sign がチラつくので、常に sign 分を表示しておく
 vim.opt.signcolumn = "yes"
+
+-- 自動保存
+local function autosave()
+  -- 保存してよいバッファだけ対象にする
+  if vim.bo.buftype ~= "" then return end
+  if not vim.bo.modifiable then return end
+  if not vim.bo.modified then return end
+
+  -- 書き込み不可な状況を避ける
+  if vim.fn.expand("%") == "" then return end
+
+  vim.cmd("silent write")
+end
+
+vim.api.nvim_create_autocmd(
+  {
+    "InsertLeave", -- insert モードを抜けたとき
+    "FocusLost",   -- フォーカスを失ったとき
+  },
+  {
+    pattern = "*",
+    callback = autosave,
+  }
+)
