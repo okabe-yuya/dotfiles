@@ -80,3 +80,6 @@ vim.opt.fillchars:append {
   vert = ' ',
   horiz = ' ',
 }
+
+-- code action sign がチラつくので、常に sign 分を表示しておく
+vim.opt.signcolumn = "yes"
