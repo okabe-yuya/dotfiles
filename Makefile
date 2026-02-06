@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim git vscode ghostty vscode-key-sync
+.PHONY: zsh tmux nvim git vscode ghostty claude vscode-key-sync
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -29,6 +29,10 @@ GHOSTTY_CONFIG = "$(HOME)/Library/Application Support/com.mitchellh.ghostty/conf
 ghostty:
 	@$(call unlink_if_file_exists,$(GHOSTTY_CONFIG))
 	ln -sv ~/dotfiles/ghostty/config $(GHOSTTY_CONFIG)
+
+claude:
+	@$(call unlink_if_file_exists,~/.claude/settings.json)
+	ln -sv ~/dotfiles/claude/settings.json ~/.claude/settings.json
 
 # VSCode keybindings auto-sync Makefile
 SRC = "$(HOME)/Library/Application Support/Code/User/keybindings.json"
