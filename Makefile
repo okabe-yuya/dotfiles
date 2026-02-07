@@ -31,8 +31,7 @@ ghostty:
 	ln -sv ~/dotfiles/ghostty/config $(GHOSTTY_CONFIG)
 
 claude:
-	@$(call unlink_if_file_exists,~/.claude/settings.json)
-	ln -sv ~/dotfiles/claude/settings.json ~/.claude/settings.json
+	scripts/make-claude.sh
 
 # VSCode keybindings auto-sync Makefile
 SRC = "$(HOME)/Library/Application Support/Code/User/keybindings.json"
