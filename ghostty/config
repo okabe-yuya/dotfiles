@@ -34,3 +34,5 @@ quick-terminal-screen = "main"
 quick-terminal-animation-duration = 0.3
 keybind = "global:f12=toggle_quick_terminal"
 
+# 画面分割したときにpathを引き継ぐ
+window-inherit-working-directory = true
