@@ -11,7 +11,7 @@ zsh:
 
 tmux:
 	@$(call unlink_if_file_exists,~/.tmux.conf)
-	ln -sv ./dotfiles/tmux/.tmux.conf ~/.tmux.conf
+	ln -sv ~/dotfiles/tmux/.tmux.conf ~/.tmux.conf
 
 nvim:
 	scripts/make-nvim.sh

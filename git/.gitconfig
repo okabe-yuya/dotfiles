@@ -3,7 +3,6 @@
 	email = takamizawa46@gmail.com
 [core]
 	autocrlf = input
-  excludesfile = ~/workspace/henry-workspace/.plans/*.md
 [push]
 	default = current
 [branch]
