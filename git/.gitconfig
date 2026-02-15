@@ -9,16 +9,19 @@
 	sort = -authordate
 
 [alias]
-  s = status
-  ss = status -s
+  st = status
+  sts = status -s
   b = branch
+
+  a = add
+  d = diff
 
   l = log
   lo = log --outline
 
   co = commit
-  co = checkout
-  sw = switch
+  cho = checkout
+  s = switch
 
   m = merge
   rb = rebase
