@@ -8,3 +8,22 @@
 [branch]
 	sort = -authordate
 
+[alias]
+  s = status
+  ss = status -s
+  b = branch
+
+  l = log
+  lo = log --outline
+
+  co = commit
+  co = checkout
+  sw = switch
+
+  m = merge
+  rb = rebase
+
+  ps = push
+  pl = pull
+  cl = clone
+
