@@ -117,3 +117,7 @@ eval "$(git wt --init zsh)"
 wt() {
   git wt "$(git wt | tail -n +2 | peco | awk '{print $(NF-1)}')"
 }
+
+# z, zi
+eval "$(zoxide init zsh)"
+

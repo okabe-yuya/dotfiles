@@ -64,6 +64,7 @@ brew "fzf"
 brew "the_silver_searcher"           # ag
 brew "bat"                           # catの代替 (シンタックスハイライト付き)
 brew "tree"
+brew "zoxide"
 
 # ===================
 # Git & GitHub
