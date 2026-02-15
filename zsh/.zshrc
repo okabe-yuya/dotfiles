@@ -110,3 +110,10 @@ export EDITOR='nvim'
 bindkey '^P' up-line-or-history    # Ctrl + P → 前の履歴
 bindkey '^N' down-line-or-history  # Ctrl + N → 次の履歴
 
+# peco と git-wt を組み合わせて worktree を切り替える
+# Add the following to your shell config to enable worktree switching and completion
+eval "$(git wt --init zsh)"
+
+wt() {
+  git wt "$(git wt | tail -n +2 | peco | awk '{print $(NF-1)}')"
+}
