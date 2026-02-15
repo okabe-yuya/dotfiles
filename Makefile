@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim git vscode ghostty claude brew vscode-key-sync
+.PHONY: zsh tmux nvim git ghostty claude brew 
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -20,10 +20,6 @@ git:
 	@$(call unlink_if_file_exists,~/.gitconfig)
 	ln -sv ~/dotfiles/git/.gitconfig ~/.gitconfig
 
-vscode:
-	@$(call unlink_if_file_exists,~/.vscode/vscode-neovim/init.lua)
-	ln -sv ~/dotfiles/vscode/init.lua ~/.vscode/vscode-neovim/init.lua
-
 GHOSTTY_CONFIG = "$(HOME)/Library/Application Support/com.mitchellh.ghostty/config"
 
 ghostty:
@@ -39,24 +35,3 @@ brew:
 		brew bundle --file=~/dotfiles/Brewfile.local; \
 	fi
 
-# VSCode keybindings auto-sync Makefile
-SRC = "$(HOME)/Library/Application Support/Code/User/keybindings.json"
-DEST = "$(HOME)/dotfiles/vscode/keybindings.json"
-GIT_DIR = "$(HOME)/dotfiles"
-COMMIT_MSG = "Update keybindings.json from VSCode at $(shell date '+%Y-%m-%d %H:%M:%S')"
-
-vscode-key-sync:
-	@cp -f $(SRC) $(DEST) 2>/dev/null || true
-	@read -p "📝 Commit and push changes? (y/n): " confirm; \
-	if [ "$$confirm" = "y" ]; then \
-		cd $(GIT_DIR) && \
-		git add $(DEST); \
-		if git diff --cached --quiet; then \
-			echo "⚠️ Nothing to commit"; \
-			exit 0; \
-		fi; \
-		git commit -m $(COMMIT_MSG); \
-		git push && echo "🚀 Changes committed and pushed!"; \
-	else \
-		echo "❌ Commit/push canceled."; \
-	fi
