@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim git vscode ghostty claude vscode-key-sync
+.PHONY: zsh tmux nvim git vscode ghostty claude brew vscode-key-sync
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -32,6 +32,12 @@ ghostty:
 
 claude:
 	scripts/make-claude.sh
+
+brew:
+	brew bundle --file=~/dotfiles/Brewfile
+	@if [ -f ~/dotfiles/Brewfile.local ]; then \
+		brew bundle --file=~/dotfiles/Brewfile.local; \
+	fi
 
 # VSCode keybindings auto-sync Makefile
 SRC = "$(HOME)/Library/Application Support/Code/User/keybindings.json"
