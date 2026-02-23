@@ -50,6 +50,12 @@ brew "kotlin"
 brew "python@3.9"
 
 # ===================
+# LSP
+# ===================
+tap "jetbrains/utils"
+brew "jetbrains/utils/kotlin-lsp"
+
+# ===================
 # Rust
 # ===================
 brew "rust-analyzer"

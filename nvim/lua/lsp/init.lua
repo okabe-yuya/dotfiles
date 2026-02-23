@@ -6,6 +6,7 @@ local lsp_servers = {
   "ts_ls",
   "ruby_lsp",
   "jsonls",
+  "kotlin_lsp",
 }
 
 vim.lsp.enable(lsp_servers)
