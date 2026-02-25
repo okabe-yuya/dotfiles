@@ -107,3 +107,8 @@ vim.api.nvim_create_autocmd(
     callback = autosave,
   }
 )
+
+-- 不要なプラグインを無効にする
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_gzip = 1
