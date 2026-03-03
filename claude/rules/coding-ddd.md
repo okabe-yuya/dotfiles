@@ -15,6 +15,42 @@ user.changeName("new name")
 ```
 
 - Entityの等価性はIDで判断すること。プロパティの一致で比較しない
+- 不変条件（invariant）は`init`ブロックで検証し、不正な状態のEntityが存在できないようにすること
+    - バリデーションをサービス側に置くと、別の生成経路で検証が漏れるリスクがある
+
+```kotlin
+// bad: サービス側でバリデーション
+class ApplyOverwriteService {
+    fun apply(invoice: Invoice, amount: BigInteger) {
+        require(amount >= BigInteger.ZERO) // ここでしか守られない
+        val overwrite = InvoiceOverwrite(amount = amount)
+    }
+}
+
+// good: Entity自身が不変条件を保証
+data class InvoiceOverwrite(val amount: BigInteger) {
+    init {
+        require(amount >= BigInteger.ZERO) { "上書き額は0以上である必要があります" }
+    }
+}
+```
+
+- nullable なプロパティを暗黙のデフォルト値で埋めないこと。ドメイン上「なぜ null になりうるか」が隠れる
+    - null を許容するならドメインモデルの型で明示し、利用側で意図的に扱う
+
+```kotlin
+// bad: null を握りつぶしてデフォルト値で埋める
+val amount = invoice.burdenAmount ?: BigInteger.ZERO
+
+// good: nullable のまま型で表現し、必要なら不変条件で明示的に弾く
+data class InvoiceOverwrite(
+    val originalBurdenAmount: BigInteger?,
+) {
+    init {
+        require(originalBurdenAmount != null) { "負担額が存在しない請求には適用できません" }
+    }
+}
+```
 
 
 ## Value Object
@@ -37,6 +73,21 @@ data class Email(val value: String) {
 ```
 
 - プリミティブ型をそのまま使い回さないこと。ドメインの意味がある値はValue Objectとして表現する
+- メソッドの引数型で事前条件を表現すること。呼び出し側で null チェック済みなら、受け取る側は non-null にする
+    - 「null が来たら何もしない」というロジックをメソッド内部に持たせず、型レベルで制約する
+
+```kotlin
+// bad: 呼び出し側で null チェックしているのに、受け取る側も nullable
+fun apply(amount: BigInteger?) {
+    if (amount == null) return
+    // ...
+}
+
+// good: 型で事前条件を表現
+fun apply(amount: BigInteger) {
+    // amount は non-null が保証されている
+}
+```
 
 
 ## Aggregate
@@ -90,10 +141,56 @@ class UserRepositoryImpl(...) : UserRepository {
     - 別のRepositoryが必要ということは集約を正しく表現できていないということになる
 
 
+## ファクトリ
+
+- ドメインモデルの生成ロジックはモデル自身に持たせること（`companion object` のファクトリメソッド）
+    - 生成時に必要な知識がモデルに集約され、外部から組み立ての詳細を知る必要がなくなる
+    - 複数の生成経路がある場合も、ファクトリメソッドを分けることで意図が明確になる
+- 外部のサービスがコンストラクタに個々のフィールドを渡して直接生成するのは避けること
+
+```kotlin
+// bad: サービス側で各フィールドを組み立てて直接生成
+val overwrite = InvoiceOverwrite(
+    id = InvoiceOverwriteId.random(),
+    originalAmount = invoice.totalAmount,
+    burdenAmount = invoice.burdenAmount,
+    overwriteAmount = newAmount,
+    createdBy = userId,
+    createTime = now,
+)
+
+// good: ファクトリメソッドに生成責務を集約
+val overwrite = InvoiceOverwrite.create(
+    invoice = invoice,
+    overwriteAmount = newAmount,
+    userId = userId,
+    now = now,
+)
+```
+
+
 ## Domain Service
 
 - 特定のEntityやValue Objectに属さないドメインロジックを配置すること
 - 状態を持たないこと（ステートレス）
+    - 時刻（`Clock`）のような環境依存値をインスタンス変数に持たせない。メソッド引数（`Instant`）で受け取ることで、テスト容易性を確保する
+
+```kotlin
+// bad: Clock をインスタンス変数に持つ
+class ApplyOverwriteService(private val clock: Clock) {
+    fun apply(invoice: Invoice) {
+        val now = clock.instant()
+    }
+}
+
+// good: Instant をメソッド引数で受け取る
+class ApplyOverwriteService {
+    fun apply(invoice: Invoice, now: Instant) {
+        // now を直接使う
+    }
+}
+```
+
 - 安易にDomain Serviceを作らないこと。まずEntityやValue Objectに配置できないか検討する
 
 ```kotlin

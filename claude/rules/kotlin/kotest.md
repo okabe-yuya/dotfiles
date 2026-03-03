@@ -43,6 +43,33 @@ class OrderTest : DescribeSpec({
     - Act・Assert: it ブロック内でテスト対象の操作を実行し、結果を検証する
 - 1つの it ブロックでは1つの振る舞いを検証すること
     - 複数の関連するアサーションを含めることは問題ないが、異なる振る舞いの検証は別の it に分けること
+- テスト上部での過剰な共通化をしないこと
+    - `lateinit var` + `beforeSpec` / `beforeEach` でヘルパーやテストデータを共通化するのは避ける
+    - 必要な箇所（`it` や `context` ブロック内）で直接宣言する方が、テストの可読性と独立性が高い
+    - 複数の `it` で本当に同一のインスタンスを共有する必要がある場合のみ、上位スコープに置くこと
+
+```kotlin
+// bad: テスト上部で過剰に共通化している
+class SomeTest : DescribeSpec({
+    val repository: SomeRepository by inject()
+    lateinit var helper: TestHelper
+    beforeSpec {
+        helper = TestHelper(repository)
+    }
+
+    it("...") { helper.doSomething() }
+})
+
+// good: 必要な箇所で宣言する
+class SomeTest : DescribeSpec({
+    val repository: SomeRepository by inject()
+
+    it("...") {
+        val helper = TestHelper(repository)
+        helper.doSomething()
+    }
+})
+```
 
 ```kotlin
 // bad: 1つの it で無関係な振る舞いを検証している
