@@ -30,7 +30,7 @@ return {
     { "<C-g>", "<cmd>Telescope live_grep<cr>", desc = "Live grep with Telescope" },
     { "<C-b>", "<cmd>Telescope buffers<cr>", desc = "Find buffers with Telescope" },
 
-    { "<leader>g", "<cmd>Telescope resume<cr>", desc = "前回の検索結果を表示する" }
+    { "<leader>r", "<cmd>Telescope resume<cr>", desc = "前回の検索結果を表示する" }
   },
   opts = {
     defaults = {

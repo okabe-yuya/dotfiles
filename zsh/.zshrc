@@ -42,6 +42,9 @@ alias gmd="git merge develop"
 alias gsp='git switch `git branch | peco | sed -e "s/*//g"`'
 alias gpc='git pull origin $(git rev-parse --abbrev-ref HEAD)'
 
+# nvim * diffview を使って差分を表示する
+alias ndiff="nvim -c 'DiffviewOpen'"
+
 # history settings
 # ------------------------------------------
 # 直前と同じコマンドは履歴に追加しない
@@ -121,4 +124,7 @@ wt() {
 
 # z, zi
 eval "$(zoxide init zsh)"
+
+# mise
+eval "$(mise activate zsh)"
 

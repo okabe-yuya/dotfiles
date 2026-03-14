@@ -3,6 +3,8 @@ local keymap = vim.keymap.set
 -- 改行して貼り付け
 keymap('n', 'P', 'o<Esc>p', { noremap = true, silent = true })
 
+keymap("n", "<leader>e", "<cmd>qa!<cr>", { desc = "Quit All" })
+
 -- 貼り付けたテキストの末尾へ自動的に移動
 keymap('v', 'y', 'y`]', { silent = true })
 keymap('v', 'p', 'p`]', { silent = true })
