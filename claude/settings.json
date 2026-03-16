@@ -23,9 +23,26 @@
       }
     ]
   },
+  "permissions": {
+    "allow": [
+      "Bash(cd )",
+      "Bash(grep )",
+      "Bash(sed )",
+      "Bash(ls)",
+      "Bash(find )",
+      "Bash(./gradlew )",
+      "Bash(git add)",
+      "Bash(git commit)",
+      "Bash(git cherry-pick)",
+      "Bash(git log)",
+      "Bash(git status)",
+      "Bash(git stash)"
+    ]
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
-    "commit-commands@claude-plugins-official": true
+    "commit-commands@claude-plugins-official": true,
+    "kotlin-lsp@claude-plugins-official": true
   }
 }
