@@ -35,7 +35,6 @@ alias vim="nvim"
 alias view="nvim -R"
 
 # git alias
-alias g="git"
 alias gpd="git pull origin develop"
 alias gsd="git switch develop"
 alias gmd="git merge develop"
