@@ -35,7 +35,6 @@ alias vim="nvim"
 alias view="nvim -R"
 
 # git alias
-alias g="git"
 alias gpd="git pull origin develop"
 alias gsd="git switch develop"
 alias gmd="git merge develop"
@@ -127,4 +126,7 @@ eval "$(zoxide init zsh)"
 
 # mise
 eval "$(mise activate zsh)"
+
+# cageの設定ファイルを読み込むパス
+export XDG_CONFIG_HOME="$HOME/.config"
 

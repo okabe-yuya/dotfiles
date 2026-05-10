@@ -76,6 +76,7 @@ brew "zoxide"
 # Git & GitHub
 # ===================
 brew "gh"
+brew "git-delta"                     # git diff pager (シンタックスハイライト付き)
 brew "k1low/tap/git-wt"             # git worktree管理
 
 # ===================
