@@ -20,7 +20,8 @@
     "ask": [
       "Bash(git commit:*)",
       "Bash(git push:*)"
-    ]
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "hooks": {
     "Notification": [
@@ -46,10 +47,16 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline.sh",
+    "padding": 0
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "kotlin-lsp@claude-plugins-official": true
-  }
+  },
+  "skipDangerousModePermissionPrompt": true
 }
