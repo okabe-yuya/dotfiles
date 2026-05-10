@@ -1,5 +1,5 @@
 ---
-name: pr-create
+name: git-pr
 description: 現在のブランチからGitHub PRを作成し、ブラウザで開く
 argument-hint: "<ベースブランチ>"
 allowed-tools: Bash, Read, Grep, Glob
