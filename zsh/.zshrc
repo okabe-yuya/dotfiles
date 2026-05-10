@@ -127,3 +127,6 @@ eval "$(zoxide init zsh)"
 # mise
 eval "$(mise activate zsh)"
 
+# cageの設定ファイルを読み込むパス
+export XDG_CONFIG_HOME="$HOME/.config"
+

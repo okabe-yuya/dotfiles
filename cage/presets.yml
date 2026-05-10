@@ -1,0 +1,32 @@
+presets:
+  base:
+    allow:
+      - "." # current
+      - "$HOME/.cache"
+      - "$HOME/.local/share"
+      - "$HOME/Library/Caches" # macos app caches
+      - "/private/tmp" # macos tmp directory
+      - "/var/folders" # macos mktemp
+      - "/Library/Caches" # macos app caches
+
+
+  git-enabled:
+    allow-git: true
+    allow-keychain: true # macOS only
+
+  claude-code:
+    allow:
+      - "$HOME/.claude"
+      - "$HOME/.claude.json"
+      - "$HOME/.claude.json.backup"
+      - "$HOME/.config/claude"
+      - "$HOME/tmp"
+      - "/tmp"
+
+auto-presets:
+  - command: claude
+    presets:
+      - base
+      - git-enabled
+      - claude-code
+

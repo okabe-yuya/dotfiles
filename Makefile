@@ -1,4 +1,4 @@
-.PHONY: zsh tmux nvim git ghostty claude brew 
+.PHONY: zsh tmux nvim git ghostty claude cage brew
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
@@ -28,6 +28,13 @@ ghostty:
 
 claude:
 	scripts/make-claude.sh
+
+CAGE_CONFIG = $(HOME)/.config/cage/presets.yml
+
+cage:
+	@mkdir -p $(dir $(CAGE_CONFIG))
+	@$(call unlink_if_file_exists,$(CAGE_CONFIG))
+	ln -sv ~/dotfiles/cage/presets.yml $(CAGE_CONFIG)
 
 brew:
 	brew bundle --file=~/dotfiles/Brewfile
