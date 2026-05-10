@@ -110,4 +110,5 @@ brew "fswatch"                       # ファイル変更監視
 # ===================
 cask "chromium"
 cask "font-jetbrains-mono-nerd-font"
+cask "warashi/tap/cage"
 
