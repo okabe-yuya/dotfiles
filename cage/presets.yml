@@ -4,11 +4,12 @@ presets:
       - "." # current
       - "$HOME/.cache"
       - "$HOME/.local/share"
+      - "$HOME/.local/stat/"
       - "$HOME/Library/Caches" # macos app caches
       - "/private/tmp" # macos tmp directory
       - "/var/folders" # macos mktemp
       - "/Library/Caches" # macos app caches
-
+      - "$HOME/.gradle"
 
   git-enabled:
     allow-git: true
