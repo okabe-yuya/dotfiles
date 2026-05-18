@@ -1,8 +1,8 @@
 ---
-name: cherry-pick-hotfix
+name: git-hotfix
 description: |
   PRのURLを指定して、マージコミットをcherry-pickしてhotfixブランチを作成し、PRを作成する。
-  「/cherry-pick-hotfix」「hotfix PR作りたい」「cherry-pickしてhotfix」などの要求時に使用。
+  「/git-hotfix」「hotfix PR作りたい」「cherry-pickしてhotfix」などの要求時に使用。
 argument-hint: "<PR URL>"
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob
