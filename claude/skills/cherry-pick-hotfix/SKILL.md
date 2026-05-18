@@ -107,16 +107,19 @@ git push -u origin hotfix/<SOURCE_BRANCH>
 
 ```bash
 gh pr create --base master --title "<PR_TITLE>" --body "$(cat <<'EOF'
-## Summary
+## Why / 背景
 
 cherry-pick of <PR URL>
 
-## Changes
+## What / 変更内容
 
-<差分の統計情報を記載>
+<元PRのdescriptionから要点を1〜2行で簡潔に記載>
 EOF
 )"
 ```
+
+- PR body はリポジトリ既存のテンプレート（Why / 背景 + What / 変更内容）に従う
+- 内容は簡潔にする。ファイル単位の差分一覧などは書かない
 
 ### Step 8: 結果報告
 
