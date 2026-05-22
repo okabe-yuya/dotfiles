@@ -9,7 +9,8 @@
 	sort = -authordate
 
 [core]
-    pager = delta
+  pager = delta
+	excludesfile = $HOME/.gitignore
 
 [interactive]
     diffFilter = delta --color-only
@@ -20,26 +21,4 @@
 
 [merge]
     conflictStyle = zdiff3
-
-[alias]
-  st = status
-  sts = status -s
-  b = branch
-
-  a = add
-  d = diff
-
-  l = log
-  lo = log --outline
-
-  co = commit
-  cho = checkout
-  s = switch
-
-  m = merge
-  rb = rebase
-
-  ps = push
-  pl = pull
-  cl = clone
 
