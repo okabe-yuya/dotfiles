@@ -3,14 +3,13 @@
 	email = takamizawa46@gmail.com
 [core]
 	autocrlf = input
+  excludesFile = ~/.gitignore
+  pager = delta
+
 [push]
 	default = current
 [branch]
 	sort = -authordate
-
-[core]
-  pager = delta
-	excludesfile = $HOME/.gitignore
 
 [interactive]
     diffFilter = delta --color-only
