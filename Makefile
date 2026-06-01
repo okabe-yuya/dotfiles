@@ -19,6 +19,8 @@ nvim:
 git:
 	@$(call unlink_if_file_exists,~/.gitconfig)
 	ln -sv ~/dotfiles/git/.gitconfig ~/.gitconfig
+	@$(call unlink_if_file_exists,~/.gitignore)
+	ln -sv ~/dotfiles/git/.gitignore ~/.gitignore
 
 GHOSTTY_CONFIG = "$(HOME)/Library/Application Support/com.mitchellh.ghostty/config"
 
