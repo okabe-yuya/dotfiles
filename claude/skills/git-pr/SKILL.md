@@ -22,7 +22,28 @@ allowed-tools: Bash, Read, Grep, Glob
 
 ### Step 2: ベースブランチの決定とdiff取得
 
-1. 引数で指定されたベースブランチを使用する。**引数が未指定の場合はベースブランチが不明である旨を報告して終了する**
+1. ベースブランチを決定する:
+   - **引数で指定がある場合**: その値を使用する
+   - **引数が未指定の場合**: 現在のブランチの「切り出し元」を推定する。以下を順に試す:
+     1. `gh pr view --json baseRefName -q .baseRefName 2>/dev/null` で既存 PR の base を取得（存在する場合）
+     2. ローカルブランチ一覧から merge-base が最も近いブランチを検出:
+        ```bash
+        current=$(git branch --show-current)
+        git for-each-ref --format='%(refname:short)' refs/heads/ \
+          | grep -v "^${current}$" \
+          | while read b; do
+              mb=$(git merge-base "$b" HEAD 2>/dev/null) || continue
+              behind=$(git rev-list --count "${mb}..${b}")
+              ahead=$(git rev-list --count "${mb}..HEAD")
+              echo "${behind} ${ahead} ${b}"
+            done \
+          | sort -n -k1,1 -k2,2 \
+          | head -1 \
+          | awk '{print $3}'
+        ```
+     3. いずれも取得できない場合はリポジトリのデフォルトブランチ（`gh repo view --json defaultBranchRef -q .defaultBranchRef.name`）にフォールバックする
+   - **推定したベースブランチをユーザーに提示して確認を得る** (例: 「ベースブランチを `feature/parent` と推定しました。これで PR を作成してよいですか？ 違う場合はブランチ名を教えてください」)。ユーザーが別のブランチを指示した場合はそれを採用する
+   - 確認なしには push / PR 作成に進まない
 2. 以下のコマンドを実行して変更内容を把握する:
    - `git log <base-branch>...HEAD --oneline` でコミット一覧を取得
    - `git diff <base-branch>...HEAD --stat` で変更ファイルの統計を取得
@@ -94,6 +115,7 @@ open <PR URL>
 ## 注意事項
 
 - `git push` と `gh pr create` はユーザーの確認なしに実行して良い（このスキルの呼び出し自体がユーザーの意図を表している）
+- **ただしベースブランチを自動推定した場合は、push / PR 作成前に必ずユーザーに確認する**（誤った base への PR は影響が大きいため）
 - PRの本文は日本語で記載する。ただしリポジトリの既存PRが英語の場合は英語に合わせる
 - ドラフトPRにはしない。ドラフトにしたい場合はユーザーが引数で指定する想定
 
