@@ -2,7 +2,6 @@
 	name = okabe-yuya
 	email = takamizawa46@gmail.com
 [core]
-	autocrlf = input
   excludesFile = ~/.gitignore
   pager = delta
 
