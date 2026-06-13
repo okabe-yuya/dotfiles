@@ -4,7 +4,7 @@
 theme = Rose Pine
 
 # Font Settings
-font-family = "JetBrains Mono"
+font-family = "Courier Prime"
 font-family = "BIZ UDGothic Bold"
 font-feature = -calt
 font-feature = -dlig
@@ -13,7 +13,7 @@ font-style-bold = false
 font-style-italic = false
 font-style-bold-italic = false
 
-font-size = 14
+font-size = 15
 
 # Window Settings
 window-padding-x = 20
