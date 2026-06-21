@@ -2,6 +2,8 @@ presets:
   base:
     allow:
       - "." # current
+      - "$HOME/workspace"
+      - "$HOME/dotfiles"
       - "$HOME/.cache"
       - "$HOME/.local/share"
       - "$HOME/.local/stat/"
