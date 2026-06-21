@@ -22,6 +22,12 @@ window-padding-color = extend-always
 window-padding-balance = true
 window-theme = ghostty
 
+# Background Image
+background-image = "~/dotfiles/ghostty/images/peacock.jpg"
+background-image-opacity = 0.10
+background-image-fit = cover
+background-image-position = center
+
 macos-titlebar-style = native
 
 # TERM
