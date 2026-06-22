@@ -39,6 +39,30 @@ allowed-tools: Skill, AskUserQuestion, Bash, Read, Edit, Write, Glob, Grep
 
 ---
 
+## 絶対ルール: sub-skill は必ず `Skill` ツールで呼ぶ
+
+dev-cycle は **オーケストレータ** であり、ロジックは各 sub-skill (`/start` / `/review` / `/git-cp` / `/git-pr` / `/ci-watch`) に閉じている。本スキルが独自判断で sub-skill の処理を **Bash / Edit / Write 等で代替してはならない**。
+
+### 禁止事項
+
+- `Skill: start` の代わりに `git checkout -b ...` を直接実行する
+- `Skill: review` の代わりに `git diff` + 目視で済ます
+- `Skill: git-cp` の代わりに `git add` / `git commit` / `git push` を直接実行する
+- `Skill: git-pr` の代わりに `gh pr create` を直接実行する
+- 「小さい変更だから」「既に方針合意済みだから」を理由に sub-skill を skip する
+
+### なぜ必須か
+
+- 各 sub-skill には独自の安全装置・規約・命名ルール・hook がある。bypass すると統一性が崩れ、ユーザーが期待する観点 (lint / 重複 check / message format 等) が抜ける
+- dev-cycle の表面挙動だけ真似て中身を変えるのは「sub-skill を更新しても dev-cycle 経由では効かない」という剥離を生む
+- 判断揺らぎ・ステップ抜けの再発を防ぐため、各 step での Skill 呼び出しは **省略不可**
+
+### スキップしたい場合
+
+`--prompt` (半手動モード) で当該 step を「スキップする」と明示的にユーザーが選択した場合に限り、Skill 呼び出しを省く。本スキル側の自己判断では skip しない。
+
+---
+
 ## 実行フロー
 
 ### Step 1: 状態確認
