@@ -24,7 +24,7 @@ window-theme = ghostty
 
 # Background Image
 background-image = "~/dotfiles/ghostty/images/peacock.jpg"
-background-image-opacity = 0.10
+background-image-opacity = 0.13
 background-image-fit = cover
 background-image-position = center
 
