@@ -44,6 +44,17 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pgrep -P $PPID -f 'kotlin-lsp' | xargs -r kill 2>/dev/null; sleep 1; pgrep -P $PPID -f 'kotlin-lsp' | xargs -r kill -9 2>/dev/null; true"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
