@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+#
+# claude-status — Claude Code セッションのステータスを集約する。
+#
+# `~/.claude/sessions/*.json` を読み、PIDが生きているセッションだけを対象に
+# 集計してワンライナーで出力する。tmux の status-right から呼ぶことを想定。
+#
+# Why session JSON: Claude Code は各プロセスの起動時に
+# ~/.claude/sessions/<pid>.json を作り、status/cwd/updatedAt をリアルタイム更新する。
+# フックを足さずにそのファイル群を読むだけでステータスが分かる。
+#
+# Usage:
+#   claude-status                # tmux 用 1行表示 (interactive のみ)
+#   claude-status --summary      # 集計のみ (例: 🤖 ●2 ○3)
+#   claude-status --list         # 全セッションを表形式で表示
+#   claude-status --json         # 機械可読 JSON 配列で出力
+#
+# 共通フラグ:
+#   --include-bg   bg (バックグラウンドサブエージェント) も含める
+#   --tmux         tmux の #[fg=...] 形式で着色（status-right から呼ぶときに付ける）
+#
+# 環境変数:
+#   CLAUDE_STATUS_LABEL_MAX   ラベル本体の最大表示文字数（既定 12, 末尾の #N は別カウント）
+#   CLAUDE_STATUS_MAIN_BRANCHES   "main" 扱いするブランチ名 (空白区切り, 既定 "main master develop trunk")
+
+set -euo pipefail
+
+SESSIONS_DIR="${CLAUDE_SESSIONS_DIR:-$HOME/.claude/sessions}"
+LABEL_MAX="${CLAUDE_STATUS_LABEL_MAX:-12}"
+MAIN_BRANCHES="${CLAUDE_STATUS_MAIN_BRANCHES:-main master develop trunk}"
+
+mode="per-session"
+include_bg=0
+color_mode="plain"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --summary|summary)         mode="summary" ;;
+    --list|list)               mode="list" ;;
+    --json|json)               mode="json" ;;
+    --per-session|per-session) mode="per-session" ;;
+    --include-bg)              include_bg=1 ;;
+    --tmux)                    color_mode="tmux" ;;
+    --plain)                   color_mode="plain" ;;
+    -h|--help)
+      sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *) echo "claude-status: unknown option: $1" >&2; exit 2 ;;
+  esac
+  shift
+done
+
+case "$color_mode" in
+  tmux)
+    BUSY_OPEN='#[fg=yellow]'; BUSY_CLOSE='#[default]'
+    IDLE_OPEN='#[fg=green]';  IDLE_CLOSE='#[default]'
+    WAIT_OPEN='#[fg=red,bold]'; WAIT_CLOSE='#[default]'
+    OTHER_OPEN='#[fg=magenta]'; OTHER_CLOSE='#[default]'
+    ;;
+  plain)
+    BUSY_OPEN=''; BUSY_CLOSE=''
+    IDLE_OPEN=''; IDLE_CLOSE=''
+    WAIT_OPEN=''; WAIT_CLOSE=''
+    OTHER_OPEN=''; OTHER_CLOSE=''
+    ;;
+esac
+
+icon_for() {
+  case "$1" in
+    busy)    printf '%s●%s' "$BUSY_OPEN" "$BUSY_CLOSE" ;;
+    idle)    printf '%s○%s' "$IDLE_OPEN" "$IDLE_CLOSE" ;;
+    waiting) printf '%s!%s' "$WAIT_OPEN" "$WAIT_CLOSE" ;;
+    *)       printf '%s?%s' "$OTHER_OPEN" "$OTHER_CLOSE" ;;
+  esac
+}
+
+# Branch 名が main 系か判定（MAIN_BRANCHES に含まれるか）
+is_main_branch() {
+  local b="$1" m
+  for m in $MAIN_BRANCHES; do
+    [[ "$b" == "$m" ]] && return 0
+  done
+  return 1
+}
+
+# 1セッション分のラベル本体を決める。
+# 非mainブランチなら branch の最終セグメント、main や非gitなら cwd basename。
+label_for() {
+  local cwd="$1" branch tail
+  branch=$(git -C "$cwd" branch --show-current 2>/dev/null || true)
+  if [[ -n "$branch" ]] && ! is_main_branch "$branch"; then
+    tail="${branch##*/}"
+    printf '%s' "$tail"
+  else
+    basename "$cwd"
+  fi
+}
+
+trunc_label() {
+  local s="$1"
+  if [[ ${#s} -gt $LABEL_MAX ]]; then
+    printf '%s…' "${s:0:$((LABEL_MAX - 1))}"
+  else
+    printf '%s' "$s"
+  fi
+}
+
+shopt -s nullglob
+files=("$SESSIONS_DIR"/*.json)
+shopt -u nullglob
+
+[[ ${#files[@]} -eq 0 ]] && exit 0
+
+# 各セッションを TSV で読み、生きてる PID のみ残す（bg は --include-bg で復活）。
+rows=()
+for f in "${files[@]}"; do
+  row=$(jq -r '[.pid, (.status // "?"), (.kind // "?"), (.cwd // ""), (.name // "")] | @tsv' "$f" 2>/dev/null) || continue
+  pid=${row%%$'\t'*}
+  [[ -z "$pid" || "$pid" == "null" ]] && continue
+  kill -0 "$pid" 2>/dev/null || continue
+  if [[ $include_bg -eq 0 ]]; then
+    kind=$(awk -F'\t' '{print $3}' <<<"$row")
+    [[ "$kind" == "bg" ]] && continue
+  fi
+  rows+=("$row")
+done
+
+[[ ${#rows[@]} -eq 0 ]] && exit 0
+
+case "$mode" in
+  list)
+    {
+      printf "PID\tSTATUS\tKIND\tBRANCH\tCWD\n"
+      for row in "${rows[@]}"; do
+        IFS=$'\t' read -r pid st kind cwd name <<<"$row"
+        branch=$(git -C "$cwd" branch --show-current 2>/dev/null || true)
+        cwd_short="${cwd/#$HOME/~}"
+        printf "%s\t%s\t%s\t%s\t%s\n" "$pid" "$st" "$kind" "${branch:--}" "$cwd_short"
+      done
+    } | column -t -s $'\t'
+    ;;
+
+  json)
+    printf '['
+    first=1
+    for row in "${rows[@]}"; do
+      IFS=$'\t' read -r pid st kind cwd name <<<"$row"
+      branch=$(git -C "$cwd" branch --show-current 2>/dev/null || true)
+      [[ $first -eq 1 ]] && first=0 || printf ','
+      jq -cn \
+        --argjson pid "$pid" \
+        --arg status "$st" \
+        --arg kind "$kind" \
+        --arg cwd "$cwd" \
+        --arg branch "$branch" \
+        --arg name "$name" \
+        '{pid:$pid, status:$status, kind:$kind, cwd:$cwd, branch:$branch, name:$name}'
+    done
+    printf ']\n'
+    ;;
+
+  summary)
+    busy=0; idle=0; waiting=0; other=0
+    for row in "${rows[@]}"; do
+      st=$(awk -F'\t' '{print $2}' <<<"$row")
+      case "$st" in
+        busy)    ((++busy))    ;;
+        idle)    ((++idle))    ;;
+        waiting) ((++waiting)) ;;
+        *)       ((++other))   ;;
+      esac
+    done
+    out="🤖"
+    [[ $busy    -gt 0 ]] && out+=" ${BUSY_OPEN}●${BUSY_CLOSE}$busy"
+    [[ $idle    -gt 0 ]] && out+=" ${IDLE_OPEN}○${IDLE_CLOSE}$idle"
+    [[ $waiting -gt 0 ]] && out+=" ${WAIT_OPEN}!${WAIT_CLOSE}$waiting"
+    [[ $other   -gt 0 ]] && out+=" ${OTHER_OPEN}?${OTHER_CLOSE}$other"
+    echo "$out"
+    ;;
+
+  per-session)
+    # ステップ:
+    #   1. 各セッションの本体ラベル (基本 branch末尾 or cwd名) を求める
+    #   2. 同名ラベルがある場合だけ #1, #2 のカウンタを末尾に付ける
+    #   3. ラベル本体だけ LABEL_MAX で省略（#N は省略しない）
+    declare -a base_labels
+    declare -A counts
+    declare -A seen
+    for row in "${rows[@]}"; do
+      IFS=$'\t' read -r pid st kind cwd name <<<"$row"
+      l=$(label_for "$cwd")
+      base_labels+=("$l")
+      counts[$l]=$((${counts[$l]:-0} + 1))
+    done
+
+    parts=()
+    for i in "${!rows[@]}"; do
+      IFS=$'\t' read -r pid st kind cwd name <<<"${rows[i]}"
+      icon=$(icon_for "$st")
+      base="${base_labels[i]}"
+      display=$(trunc_label "$base")
+      if [[ ${counts[$base]} -gt 1 ]]; then
+        seen[$base]=$((${seen[$base]:-0} + 1))
+        display+="#${seen[$base]}"
+      fi
+      parts+=("${icon} ${display}")
+    done
+    echo "🤖 ${parts[*]}"
+    ;;
+esac
