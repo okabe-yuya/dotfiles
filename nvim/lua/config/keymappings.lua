@@ -1,7 +1,7 @@
 local keymap = vim.keymap.set
 
 -- 改行して貼り付け
-keymap('n', 'P', 'o<Esc>p', { noremap = true, silent = true })
+keymap('n', 'P', 'o<Esc>p==', { noremap = true, silent = true })
 
 keymap("n", "<leader>e", "<cmd>qa!<cr>", { desc = "Quit All" })
 
