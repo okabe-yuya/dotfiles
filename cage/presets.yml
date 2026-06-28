@@ -6,9 +6,9 @@ presets:
       - "$HOME/dotfiles"
       - "$HOME/.cache"
       - "$HOME/.local/share"
-      - "$HOME/.local/stat/"
+      - "$HOME/.local/state"
       - "$HOME/Library/Caches" # macos app caches
-      - "$HOME/Library/Caches" # macos app caches
+      - "$HOME/Library/Application Support/kotlin"
       - "$HOME/.gradle"
       - "/private/tmp" # macos tmp directory
       - "/var/folders" # macos mktemp
