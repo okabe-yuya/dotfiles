@@ -3,20 +3,21 @@
 DOTFILES_DIR="$HOME/dotfiles"
 CLAUDE_DIR="$HOME/.claude"
 
-# settings.json
-if [ -e "$CLAUDE_DIR/settings.json" ]; then
-    unlink "$CLAUDE_DIR/settings.json"
-fi
-ln -sv "$DOTFILES_DIR/claude/settings.json" "$CLAUDE_DIR/settings.json"
+GREEN=$'\033[32m'
+RESET=$'\033[0m'
 
-# skills
-rm -rf "$CLAUDE_DIR/skills"
-ln -sv "$DOTFILES_DIR/claude/skills" "$CLAUDE_DIR/skills"
+link() {
+    local src="$1"
+    local dst="$2"
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+        rm -rf "$dst"
+    fi
+    mkdir -p "$(dirname "$dst")"
+    ln -s "$src" "$dst"
+    printf "  ${GREEN}✓${RESET} %s\n" "$dst"
+}
 
-# rules
-rm -rf "$CLAUDE_DIR/rules"
-ln -sv "$DOTFILES_DIR/claude/rules" "$CLAUDE_DIR/rules"
-
-# agents
-rm -rf "$CLAUDE_DIR/agents"
-ln -sv "$DOTFILES_DIR/claude/agents" "$CLAUDE_DIR/agents"
+link "$DOTFILES_DIR/claude/settings.json" "$CLAUDE_DIR/settings.json"
+link "$DOTFILES_DIR/claude/skills"        "$CLAUDE_DIR/skills"
+link "$DOTFILES_DIR/claude/rules"         "$CLAUDE_DIR/rules"
+link "$DOTFILES_DIR/claude/agents"        "$CLAUDE_DIR/agents"

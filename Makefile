@@ -1,52 +1,68 @@
 .PHONY: all setup zsh tmux nvim git ghostty claude cage brew
 
+# 出力用 ANSI エスケープ
+H := \033[1;36m
+G := \033[32m
+B := \033[1;32m
+R := \033[0m
+
+# シンボリックリンクを作成し、結果を一行で表示する
+# 使い方: $(call link,<src>,<dst>)
+define link
+	@if [ -e "$(2)" ] || [ -L "$(2)" ]; then rm -rf "$(2)"; fi
+	@mkdir -p "$$(dirname "$(2)")"
+	@ln -s "$(1)" "$(2)"
+	@printf "  $(G)✓$(R) %s\n" "$(2)"
+endef
+
+# セクションヘッダ
+define section
+	@printf "\n$(H)==> $(1)$(R)\n"
+endef
+
 # 何も指定しなければ all (= setup + brew)
 all: setup brew
 
 # シンボリックリンクのセットアップだけ (brew は分離)
 setup: zsh tmux nvim git ghostty claude cage
-
-unlink_if_file_exists = \
-	if [ -e $1 ]; then \
-		unlink $1; \
-	fi
+	@printf "\n$(B)✨ Setup completed!$(R)\n"
 
 zsh:
-	@$(call unlink_if_file_exists,~/.zshrc)
-	ln -sv ~/dotfiles/zsh/.zshrc ~/.zshrc
+	$(call section,zsh)
+	$(call link,$(HOME)/dotfiles/zsh/.zshrc,$(HOME)/.zshrc)
 
 tmux:
-	@$(call unlink_if_file_exists,~/.tmux.conf)
-	ln -sv ~/dotfiles/tmux/.tmux.conf ~/.tmux.conf
+	$(call section,tmux)
+	$(call link,$(HOME)/dotfiles/tmux/.tmux.conf,$(HOME)/.tmux.conf)
 
 nvim:
-	scripts/make-nvim.sh
+	$(call section,nvim)
+	@scripts/make-nvim.sh
 
 git:
-	@$(call unlink_if_file_exists,~/.gitconfig)
-	ln -sv ~/dotfiles/git/.gitconfig ~/.gitconfig
-	@$(call unlink_if_file_exists,~/.gitignore)
-	ln -sv ~/dotfiles/git/.gitignore ~/.gitignore
+	$(call section,git)
+	$(call link,$(HOME)/dotfiles/git/.gitconfig,$(HOME)/.gitconfig)
+	$(call link,$(HOME)/dotfiles/git/.gitignore,$(HOME)/.gitignore)
 
-GHOSTTY_CONFIG = "$(HOME)/Library/Application Support/com.mitchellh.ghostty/config"
+GHOSTTY_CONFIG = $(HOME)/Library/Application Support/com.mitchellh.ghostty/config
 
 ghostty:
-	@$(call unlink_if_file_exists,$(GHOSTTY_CONFIG))
-	ln -sv ~/dotfiles/ghostty/config $(GHOSTTY_CONFIG)
+	$(call section,ghostty)
+	$(call link,$(HOME)/dotfiles/ghostty/config,$(GHOSTTY_CONFIG))
 
 claude:
-	scripts/make-claude.sh
+	$(call section,claude)
+	@scripts/make-claude.sh
 
 CAGE_CONFIG = $(HOME)/.config/cage/presets.yml
 
 cage:
-	@mkdir -p $(dir $(CAGE_CONFIG))
-	@$(call unlink_if_file_exists,$(CAGE_CONFIG))
-	ln -sv ~/dotfiles/cage/presets.yml $(CAGE_CONFIG)
+	$(call section,cage)
+	$(call link,$(HOME)/dotfiles/cage/presets.yml,$(CAGE_CONFIG))
 
 brew:
-	brew bundle --file=~/dotfiles/Brewfile
-	@if [ -f ~/dotfiles/Brewfile.local ]; then \
-		brew bundle --file=~/dotfiles/Brewfile.local; \
+	$(call section,brew)
+	@brew bundle --file=$(HOME)/dotfiles/Brewfile
+	@if [ -f $(HOME)/dotfiles/Brewfile.local ]; then \
+		brew bundle --file=$(HOME)/dotfiles/Brewfile.local; \
 	fi
-
