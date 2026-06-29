@@ -9,10 +9,6 @@ return {
       local js_formatters = { "biome", "prettierd", "prettier", stop_after_first = true }
 
       return {
-        args = {
-          "--indent-width=2",
-          "--indent-sylte=space",
-        },
         formatters_by_ft = {
           html = { 'injected', lsp_format = 'first' },
           lua = { 'stylua', stop_after_first = true },

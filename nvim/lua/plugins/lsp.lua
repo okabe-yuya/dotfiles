@@ -49,23 +49,11 @@ return {
         "kotlin_lsp",
       })
 
-      -- LspAttach 時のキーマップ
-      vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('MyLspMaps', { clear = true }),
-        callback = function(ev)
-          local map = vim.keymap.set
-          local opt = function(desc)
-            return { silent = true, buffer = ev.buf, desc = desc }
-          end
-
-          -- 行のエラー詳細をフロート表示 (組み込み <C-w>d でも可)
-          map('n', 'ge', vim.diagnostic.open_float, opt('show line diagnostics'))
-
-          -- diagnostic ジャンプ (組み込み ]d / [d でも可)
-          map('n', '<leader>j', function() vim.diagnostic.jump({ count = 1, float = true }) end, opt('next diagnostic'))
-          map('n', '<leader>k', function() vim.diagnostic.jump({ count = -1, float = true }) end, opt('prev diagnostic'))
-        end,
-      })
+      -- diagnostic 操作のキーマップ (vim.diagnostic は LSP attach 非依存なのでグローバルに登録)
+      -- カーソル静止で自動フロート表示するため、手動表示用のマッピングは不要
+      local map = vim.keymap.set
+      map('n', '<leader>j', function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = 'next diagnostic' })
+      map('n', '<leader>k', function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = 'prev diagnostic' })
     end,
   },
 
