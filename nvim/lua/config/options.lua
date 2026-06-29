@@ -71,7 +71,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- カーソル停止から CursorHold 発火までの待ち時間 (ms)
 -- swap 書き込みや CursorHold ベースの autocmd (LSP の diagnostic フロート等) に影響
-vim.opt.updatetime = 1000
+vim.opt.updatetime = 500
 
 -- ウィンドウ境界線を非表示
 vim.api.nvim_set_hl(0, "WinSeparator", { bg = "none" })
