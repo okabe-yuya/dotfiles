@@ -1,10 +1,4 @@
 return {
-  -- コメント・コメントアウト
-  {
-    "numToStr/Comment.nvim",
-    opts = {},
-  },
-
   -- 括弧などを自動で閉じる
   {
     'windwp/nvim-autopairs',
