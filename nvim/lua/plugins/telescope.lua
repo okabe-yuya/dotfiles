@@ -53,10 +53,6 @@ return {
           reverse_directories = false,
         },
       },
-      -- ファイル名以外のメタ情報は表示しない
-      file_browser = {
-        display_stat = false,
-      },
     },
   }
 }

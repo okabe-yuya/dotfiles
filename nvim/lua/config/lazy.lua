@@ -21,20 +21,7 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
--- Load plugins
-local plugin_specs = {}
-
--- plugins/*.lua をすべて読み込む（ただし自分自身を除く）
-local plugin_dir = vim.fn.stdpath("config") .. "/lua/plugins"
-for _, file in ipairs(vim.fn.readdir(plugin_dir)) do
-  if file:match("%.lua$") and file ~= "init.lua" then
-    local spec = require("plugins." .. file:gsub("%.lua$", ""))
-    if type(spec) == "table" then
-      table.insert(plugin_specs, spec)
-    end
-  end
-end
-
+-- plugins/*.lua は lazy.nvim が自動で import する
 require("lazy").setup("plugins", {
   performance = {
     rtp = {
