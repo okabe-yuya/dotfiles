@@ -31,6 +31,9 @@ vim.opt.clipboard = "unnamed"
 -- ファイルをデフォルトで右側に表示する
 vim.opt.splitright = true
 
+-- ステータスラインを非表示
+vim.opt.laststatus = 0
+
 -- 行番号を表示
 vim.opt.number = true
 vim.opt.relativenumber = true

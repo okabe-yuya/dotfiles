@@ -1,5 +1,5 @@
 return {
-  -- インデントを分かりやすく
+  -- インデントを分かりやすくするためのプラグイン
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
@@ -16,19 +16,13 @@ return {
     name = "rose-pine",
     config = function()
       vim.cmd("colorscheme rose-pine")
-
-      vim.opt.laststatus = 0
     end
   },
 
 
   {
+    -- パンくずリストのようにコード構造を上部に表示してくれるプラグイン
     'Bekaboo/dropbar.nvim',
-    -- optional, but required for fuzzy finder support
-    dependencies = {
-      'nvim-telescope/telescope-fzf-native.nvim',
-      build = 'make'
-    },
     config = function()
       local dropbar_api = require('dropbar.api')
       vim.keymap.set('n', '<Leader>l', dropbar_api.pick, { desc = 'Pick symbols in winbar' })

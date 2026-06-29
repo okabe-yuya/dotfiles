@@ -44,7 +44,8 @@
 --   end,
 -- }
 
--- ## oil
+-- ファイルツリーを表示するためのプラグイン
+-- oilをファイルツリーと呼ぶのか？についてはやや疑問があるが...
 return {
   "stevearc/oil.nvim",
   dependencies = { { "nvim-mini/mini.icons", opts = {} } },
