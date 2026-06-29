@@ -1,4 +1,10 @@
-.PHONY: zsh tmux nvim git ghostty claude cage brew
+.PHONY: all setup zsh tmux nvim git ghostty claude cage brew
+
+# 何も指定しなければ all (= setup + brew)
+all: setup brew
+
+# シンボリックリンクのセットアップだけ (brew は分離)
+setup: zsh tmux nvim git ghostty claude cage
 
 unlink_if_file_exists = \
 	if [ -e $1 ]; then \
