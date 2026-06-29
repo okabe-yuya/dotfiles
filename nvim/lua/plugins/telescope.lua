@@ -1,58 +1,34 @@
--- telescope で検索結果から複数ファイルを開けるようにする
--- https://github.com/nvim-telescope/telescope.nvim/issues/1048#issuecomment-1679797700
-local select_one_or_multi = function(prompt_bufnr)
-  local picker = require('telescope.actions.state').get_current_picker(prompt_bufnr)
-  local multi = picker:get_multi_selection()
-  if not vim.tbl_isempty(multi) then
-    require('telescope.actions').close(prompt_bufnr)
-    for _, j in pairs(multi) do
-      if j.path ~= nil then
-        vim.cmd(string.format('%s %s', 'edit', j.path))
-      end
-    end
-  else
-    require('telescope.actions').select_default(prompt_bufnr)
-  end
-end
-
-local close_window = function(prompt_bufnr)
-  local actions = require('telescope.actions')
-  actions.close(prompt_bufnr)
-end
-
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },
   lazy = true,
   keys = {
     -- key mapping は VsCodeライクに設定
-    { "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Find files with Telescope" },
-    { "<C-g>", "<cmd>Telescope live_grep<cr>", desc = "Live grep with Telescope" },
-    { "<C-b>", "<cmd>Telescope buffers<cr>", desc = "Find buffers with Telescope" },
-
-    { "<leader>r", "<cmd>Telescope resume<cr>", desc = "前回の検索結果を表示する" }
+    { "<C-p>",     "<cmd>Telescope find_files<cr>", desc = "Find files" },
+    { "<C-g>",     "<cmd>Telescope live_grep<cr>",  desc = "Live grep" },
+    { "<C-b>",     "<cmd>Telescope buffers<cr>",    desc = "Find buffers" },
+    { "<leader>r", "<cmd>Telescope resume<cr>",     desc = "前回の検索結果を表示する" },
   },
-  opts = {
-    defaults = {
-      mappings = {
-        i = {
-          -- TABで複数選択したファイルをバッファにまとめて読み込む
-          ['<CR>'] = select_one_or_multi,
+  opts = function()
+    local actions = require('telescope.actions')
 
-          -- INSERTモードでもescを押したらウィンドウを閉じる
-          ['<esc>'] = close_window,
-        }
-      },
-      file_ignore_patterns = {
-        "node_modules",
-        "%.git/",
-      },
-      -- ファイルを表示してからディレクトリを後述する
-      path_display = {
-        filename_first = {
-          reverse_directories = false,
+    return {
+      defaults = {
+        mappings = {
+          i = {
+            -- INSERTモードでもescを押したらウィンドウを閉じる
+            ['<esc>'] = actions.close,
+          },
         },
+        file_ignore_patterns = {
+          "node_modules",
+          "%.git/",
+          "%.claude/",
+          "%.gradle/",
+          "worktrees/",
+        },
+        path_display = { "filename_first" },
       },
-    },
-  }
+    }
+  end,
 }
