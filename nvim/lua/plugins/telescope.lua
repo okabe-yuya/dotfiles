@@ -28,6 +28,16 @@ return {
           "worktrees/",
         },
         path_display = { "filename_first" },
+        -- 一覧を上、プレビューを下に配置 (狭いウィンドウでも preview を確保)
+        layout_strategy = "vertical",
+        layout_config = {
+          vertical = {
+            mirror = true,
+            preview_height = 0.5,
+          },
+          width = 0.9,
+          height = 0.9,
+        },
       },
     }
   end,
