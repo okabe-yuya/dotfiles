@@ -14,7 +14,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, ToolSearch,
 
 ベースブランチからの新規ブランチ作成 → HTML プラン作成・ブラウザ表示 → ユーザー承認 → 実装開始までを一気通貫で行うスキル。
 
-**重要:** このスキルは cage + `--dangerously-skip-permissions`（bypass permission）モードでの利用を前提としている。`EnterPlanMode` は使わず、プランは HTML ファイルとして `.claude-doc/` に書き出してブラウザで開き、ユーザーからの承認後はそのまま bypass permission モードで実装を続ける。
+**重要:** このスキルは cage + `--dangerously-skip-permissions`（bypass permission）モードでの利用を前提としている。`EnterPlanMode` は使わず、プランは HTML ファイルとして `<workspace_root>/.claude-doc/<repo_name>/` に書き出してブラウザで開き、ユーザーからの承認後はそのまま bypass permission モードで実装を続ける。
 
 ## 引数
 
@@ -40,32 +40,32 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, ToolSearch,
 - 未コミット変更あり: 変更内容を一覧表示して「先に commit / stash してください」と報告して終了
 - ベースブランチが存在しない: 報告して終了
 
-### Step 2: `.claude-doc` の global ignore 設定
+### Step 2: プラン出力先ディレクトリの準備
 
-プランファイル出力先 `.claude-doc/` を git の global ignore に追加する。
+プランファイルは各リポジトリの `<cwd>/.claude-doc/` ではなく、**リポジトリの1つ上の階層（ワークスペースルート）に集約**する（複数リポジトリ（henry-backend, henry-web 等）を横断して作業する際に `.claude-doc/` があちこちに散らばるのを防ぐため）。
 
 ```bash
-# 現在の設定を確認
+# 現在の git リポジトリのルート名をサブディレクトリ名として使う
+repo_toplevel="$(git rev-parse --show-toplevel)"
+repo_name="$(basename "$repo_toplevel")"
+workspace_root="$(dirname "$repo_toplevel")"
+mkdir -p "$workspace_root/.claude-doc/$repo_name"
+```
+
+**注意:** ホームディレクトリ直下（`~/.claude-doc/` 等）への書き込みはサンドボックス環境で権限エラーになることがある（実績あり）。ワークスペースルート（プロジェクトツリー内）への書き込みに留める。
+
+出力先 `$workspace_root/.claude-doc/<repo_name>/` は、ワークスペースルート自体が git リポジトリの場合はその working tree に含まれる。global の `core.excludesFile` に `.claude-doc/` パターンが登録済みかを確認し、無ければ追加する（末尾スラッシュなしパターンは全階層にマッチする）:
+
+```bash
 git config --global --get core.excludesFile
-```
-
-**core.excludesFile が未設定の場合:**
-
-```bash
-mkdir -p ~/.config/git
-touch ~/.config/git/ignore
-git config --global core.excludesFile ~/.config/git/ignore
-```
-
-**`.claude-doc` がまだ ignore リストにない場合:**
-
-```bash
-# 重複追加を避けるため grep で確認してから append する
+# 未設定なら
+mkdir -p ~/.config/git && touch ~/.config/git/ignore && git config --global core.excludesFile ~/.config/git/ignore
+# .claude-doc/ が未登録なら追加
 grep -qxF '.claude-doc/' "$(git config --global --get core.excludesFile)" \
   || echo '.claude-doc/' >> "$(git config --global --get core.excludesFile)"
 ```
 
-ignore 設定の追加内容をユーザーに報告する。
+**フォールバック:** `workspace_root` への書き込みが権限エラーになる場合（例: リポジトリが直接ホーム直下やアクセス制限のある場所にある）は、従来通り `<cwd>/.claude-doc/`（リポジトリ自身の直下）にフォールバックする。
 
 ### Step 3: ベースブランチを最新化
 
@@ -148,31 +148,46 @@ Linear 公式の MCP ツールがあれば優先する。なければ `WebFetch`
 
 ### Step 7: プラン本体の組み立て
 
-以下のセクションを含むプランを内部的に組み立てる。
+以下のセクションを含むプランを内部的に組み立てる。情報量が多くなるため、**「概要」と「詳細」の 2 段構成**を前提に組み立てる（Step 8 のテンプレート参照）。概要だけ読めば全体像が把握でき、詳細は折りたたみで必要な箇所だけ確認できるようにする。
+
+**概要に含めるもの**（一覧性・確認しやすさを優先し、簡潔に）:
 
 - **タスクタイトル**
 - メタ情報（ステータス: Draft / ブランチ / ベース / 起票元 / 作成日時 YYYY-MM-DD HH:MM:SS）
-- **背景**: なぜこの実装が必要か。元ドキュメントから抜粋・要約
-- **ゴール**: 達成すべきこと / 達成しないこと（スコープ外）
+- **背景**: なぜこの実装が必要か。元ドキュメントから抜粋・要約（数行程度）
+- **ゴール**: 達成すべきこと / 達成しないこと（スコープ外）を簡潔に
+- **確認事項**: ユーザーに確認したい技術判断（あれば概要に目立つ形で配置する。実装着手のブロッカーになり得るため埋もれさせない）
+- **実装ステップ一覧**: Phase タイトルと一言要約のみ（詳細への内部リンク付き）
+
+**詳細（折りたたみ）に含めるもの**:
+
 - **影響範囲**: 変更対象ファイル / 影響を受ける機能
-- **実装ステップ**: Phase ごとにチェックリスト形式で
+- **技術方針（調査結果）**: 既存アーキテクチャの調査結果、採用する設計判断とその理由
+- **実装ステップ**: Phase ごとにチェックリスト形式 + **サンプルコード**
+  - 各 Phase、特に既存パターンの転用・新しい型定義・複雑なロジック変更を伴う Phase には、具体的なサンプルコード（対象言語のシンタックスで、実際のファイル名・関数名を示す）を添える。プレーンな箇条書き説明だけで済ませない
+  - サンプルコードは「実装イメージ」であることを明記し、実装時に既存コードとの整合を取る前提とする
 - **テスト方針**: 正常系・異常系・境界値で必要なテストケース
-- **確認事項**: ユーザーに確認したい技術判断（必要に応じて）
 
 ### Step 8: HTML プランの書き出しとブラウザ表示
 
-プランを HTML として `.claude-doc/` 配下に書き出してブラウザで開く。
+プランを HTML として `<workspace_root>/.claude-doc/<repo_name>/` 配下に書き出してブラウザで開く（Step 2 参照。リポジトリ自身の `<cwd>/.claude-doc/` には作らない。フォールバック時のみそちらを使う）。
 
-**出力先:** `<cwd>/.claude-doc/`
+**出力先:** `<workspace_root>/.claude-doc/<repo_name>/`（`workspace_root` = リポジトリの1つ上の階層）
 **ファイル名:** `YYYYMMDD-HHMMSS-{branch-slug}.html`
 （branch-slug は `<new-branch>` の `feat/` などのプレフィックスを除いた部分）
 
 ```bash
-mkdir -p .claude-doc
+# シェル変数は Bash 呼び出しをまたいで残らないため、Step 2 と同じ計算をここでも行う
+repo_toplevel="$(git rev-parse --show-toplevel)"
+repo_name="$(basename "$repo_toplevel")"
+workspace_root="$(dirname "$repo_toplevel")"
+echo "$workspace_root/.claude-doc/$repo_name"
 date "+%Y%m%d-%H%M%S"
 ```
 
-**HTML テンプレート（埋め込み CSS で読みやすく整形）:**
+**HTML テンプレート（概要 / 詳細の 2 段構成 + サンプルコード + シンタックスハイライト）:**
+
+情報量が多いプランは一覧性が落ちて確認しづらくなる。そのため **概要（常に展開）** と **詳細（`<details>` で折りたたみ）** に分割し、概要だけでも全体像・確認事項が把握できるようにする。詳細セクションの各 Phase には可能な限り具体的な**サンプルコード**（対象言語の実際のファイル名・関数名を使ったイメージコード）を添える。コードブロックには依存なしの簡易シンタックスハイライトを当てる（CDN 不可のオフライン環境のため自前 JS で実装）。
 
 ```html
 <!doctype html>
@@ -181,20 +196,66 @@ date "+%Y%m%d-%H%M%S"
   <meta charset="utf-8">
   <title>{タスクタイトル}</title>
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
-           max-width: 880px; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.7; }
-    h1 { border-bottom: 2px solid #888; padding-bottom: .3rem; }
-    h2 { margin-top: 2rem; border-left: 4px solid #4a90e2; padding-left: .5rem; }
-    h3 { margin-top: 1.2rem; }
-    .meta { background: rgba(127,127,127,.08); padding: .8rem 1rem; border-radius: 6px; font-size: .9rem; }
-    .meta dt { font-weight: 600; float: left; width: 6rem; }
-    .meta dd { margin-left: 6rem; margin-bottom: .2rem; }
-    ul { padding-left: 1.4rem; }
-    code { background: rgba(127,127,127,.15); padding: 1px 4px; border-radius: 3px; font-size: .9em; }
-    .phase { background: rgba(74,144,226,.06); padding: .5rem 1rem; border-radius: 6px; margin-bottom: .8rem; }
-    .status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .8rem;
+    /* 常に白基調（ダークモード非対応。system dark mode でも白背景を強制する） */
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
+      max-width: 920px; margin: 2rem auto; padding: 0 1.5rem 4rem; line-height: 1.75;
+      background: #ffffff; color: #1f2328;
+    }
+    /* 見出し・段落・リスト等、コンポーネントごとに明示的な margin を持たせる（詰まって見えるのを防ぐ） */
+    h1 { margin: 0 0 1.5rem; border-bottom: 2px solid #888; padding-bottom: .5rem; }
+    h2 { margin: 3rem 0 1.2rem; border-left: 4px solid #4a90e2; padding-left: .6rem; }
+    h2:first-of-type { margin-top: 0; }
+    h2.section-title { border-left-color: #d9534f; font-size: 1.3em; }
+    h3 { margin: 2rem 0 .8rem; }
+    h3:first-child { margin-top: 0; }
+    h4 { margin: 1.6rem 0 .6rem; }
+    h4:first-child { margin-top: 0; }
+    p { margin: 0 0 1rem; }
+    ul, ol { margin: 0 0 1.2rem; padding-left: 1.5rem; }
+    li { margin-bottom: .3rem; }
+    .meta { background: #f6f8fa; padding: 1rem 1.2rem; border-radius: 6px; font-size: .9rem; margin-bottom: 2rem; }
+    .meta dt { font-weight: 600; float: left; width: 8rem; clear: left; }
+    .meta dd { margin-left: 8rem; margin-bottom: .4rem; }
+    code { background: #eef0f2; padding: 1px 5px; border-radius: 3px; font-size: .9em; }
+    pre { background: #f6f8fa; border: 1px solid #e1e4e8; padding: 1rem 1.2rem; border-radius: 6px;
+          overflow-x: auto; font-size: .85em; margin: 0 0 1.2rem; }
+    pre code { background: none; padding: 0; }
+    .status { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: .8rem;
               background: #f0ad4e; color: #fff; }
+    table { border-collapse: collapse; width: 100%; margin: 0 0 1.2rem; }
+    th, td { border: 1px solid #d8dce0; padding: .5rem .7rem; text-align: left; font-size: .9em; }
+    th { background: #f6f8fa; }
+    .warn { background: #fef6e7; border-left: 4px solid #f0ad4e; padding: .8rem 1.2rem; border-radius: 4px; margin: 0 0 1.2rem; }
+    .confirm { background: #fdf1f0; border-left: 4px solid #d9534f; padding: .8rem 1.2rem; border-radius: 4px; margin: 0 0 1rem; }
+    .toc { padding-left: 0; list-style: none; margin-bottom: 1.5rem; }
+    .toc li { margin-bottom: .5rem; }
+    .toc a { text-decoration: none; color: #1d63c9; }
+    .toc a:hover { text-decoration: underline; }
+    .expand-all { font-size: .85em; background: #fff; border: 1px solid #c8ccd1;
+      border-radius: 4px; padding: .4rem .8rem; cursor: pointer; margin: 0 .6rem 1.2rem 0; }
+    /* 詳細セクション: 折りたたみ */
+    details.phase, details.block {
+      background: #f7f9fc; border: 1px solid #e1e6ec; border-radius: 8px; margin: 0 0 1.2rem; padding: 1rem 1.4rem;
+    }
+    details.phase > summary, details.block > summary {
+      cursor: pointer; font-weight: 700; font-size: 1.05em; padding: .3rem 0; list-style: none;
+    }
+    details.phase[open] > summary, details.block[open] > summary { margin-bottom: 1rem; }
+    details.phase > summary::-webkit-details-marker, details.block > summary::-webkit-details-marker { display: none; }
+    details.phase > summary::before, details.block > summary::before { content: "▶ "; }
+    details.phase[open] > summary::before, details.block[open] > summary::before { content: "▼ "; }
+    details.phase > :last-child, details.block > :last-child { margin-bottom: 0; }
+    summary .hook { font-weight: 400; color: #6a737d; font-size: .85em; margin-left: .4rem; }
+    /* 簡易シンタックスハイライト用トークン色（白基調前提。ダークモード分岐は持たせない） */
+    pre .tok-com { color: #6a737d; font-style: italic; }
+    pre .tok-str { color: #22863a; }
+    pre .tok-ann { color: #b35900; }
+    pre .tok-kw  { color: #8250df; font-weight: 600; }
+    pre .tok-num { color: #0b7285; }
+    pre .tok-type { color: #1d63c9; }
   </style>
 </head>
 <body>
@@ -207,54 +268,118 @@ date "+%Y%m%d-%H%M%S"
     <dt>作成日時</dt><dd>YYYY-MM-DD HH:MM:SS</dd>
   </dl>
 
-  <h2>背景</h2>
-  <p>...</p>
+  <!-- ============ 概要（常に展開・簡潔に） ============ -->
+  <h2 class="section-title">概要</h2>
 
-  <h2>ゴール</h2>
-  <h3>達成すべきこと</h3>
-  <ul><li>...</li></ul>
-  <h3>達成しないこと（スコープ外）</h3>
-  <ul><li>...</li></ul>
+  <h3>背景 / やりたいこと</h3>
+  <p>...（数行で）</p>
 
-  <h2>影響範囲</h2>
-  <h3>変更対象ファイル</h3>
-  <ul><li><code>path/to/file</code></li></ul>
-  <h3>影響を受ける機能</h3>
-  <ul><li>...</li></ul>
+  <h3>ゴール</h3>
+  <p>達成すべきこと・達成しないこと（スコープ外）を簡潔に。表形式が読みやすければ表を使う。</p>
 
-  <h2>実装ステップ</h2>
-  <div class="phase">
-    <h3>Phase 1: {小見出し}</h3>
-    <ul><li>ステップ1</li><li>ステップ2</li></ul>
-  </div>
-  <div class="phase">
-    <h3>Phase 2: {小見出し}</h3>
+  <!-- 確認事項があれば概要に目立つ形で配置。ブロッカーになり得るため埋もれさせない -->
+  <h3 style="color:#d9534f;">確認事項（あれば）</h3>
+  <div class="confirm"><strong>1. {確認したいこと}</strong><br>{背景・提案する既定値}</div>
+
+  <h3>実装ステップ一覧（クリックで詳細）</h3>
+  <button class="expand-all" type="button" onclick="document.querySelectorAll('details').forEach(d => d.open = true)">すべて展開</button>
+  <button class="expand-all" type="button" onclick="document.querySelectorAll('details').forEach(d => d.open = false)">すべて折りたたむ</button>
+  <ul class="toc">
+    <li><a href="#impact">影響範囲</a> <span class="hook">— 変更対象ファイル・影響を受ける機能</span></li>
+    <li><a href="#tech-policy">技術方針（調査結果）</a> <span class="hook">— 既存アーキテクチャと設計判断</span></li>
+    <li><a href="#phase1">Phase 1: {小見出し}</a> <span class="hook">— 一言要約</span></li>
+    <!-- Phase の数だけ追加 -->
+    <li><a href="#test-policy">テスト方針（まとめ）</a></li>
+  </ul>
+
+  <!-- ============ 詳細（折りたたみ） ============ -->
+  <h2 class="section-title" id="detail">詳細</h2>
+
+  <details class="block" id="impact">
+    <summary>影響範囲 <span class="hook">変更対象ファイル・影響を受ける機能</span></summary>
+    <h4>変更対象ファイル</h4>
+    <ul><li><code>path/to/file</code>: 変更内容</li></ul>
+    <h4>影響を受ける機能</h4>
     <ul><li>...</li></ul>
-  </div>
+  </details>
 
-  <h2>テスト方針</h2>
-  <ul><li>...</li></ul>
+  <details class="block" id="tech-policy">
+    <summary>技術方針（調査結果） <span class="hook">既存アーキテクチャと設計判断</span></summary>
+    <p>既存実装の調査結果、採用する設計とその理由（既存パターンの転用元ファイル・行番号を明示する）。</p>
+  </details>
 
-  <h2>確認事項</h2>
-  <ul><li>...</li></ul>
+  <details class="phase" id="phase1">
+    <summary>Phase 1: {小見出し} <span class="hook">一言要約</span></summary>
+    <ul><li>ステップ1</li><li>ステップ2</li></ul>
+    <!-- 複雑な変更・既存パターン転用・新しい型定義を伴う場合は必ずサンプルコードを添える -->
+    <pre><code>// path/to/File.kt（実装イメージ。実装時に既存コードとの整合を取る）
+...
+</code></pre>
+  </details>
+  <!-- Phase 2, 3... も同様に <details class="phase"> で追加 -->
+
+  <details class="block" id="test-policy">
+    <summary>テスト方針（まとめ）</summary>
+    <ul><li>正常系・異常系・境界値のテストケース</li></ul>
+  </details>
+
+  <script>
+    // 依存なしの簡易シンタックスハイライト（CDN 不可のオフライン環境向け。Kotlin 以外の言語でも
+    // キーワード配列を書き換えれば流用可）
+    (function () {
+      var KEYWORDS = ['fun','val','var','class','object','interface','enum','sealed','data','private',
+        'public','protected','internal','open','abstract','override','return','when','if','else','for',
+        'while','do','is','in','as','null','true','false','import','package','companion','by','const',
+        'lateinit','this','super','inline','value','infix','operator','suspend','out','reified','where',
+        'try','catch','finally','throw','init','get','set','vararg','typealias'];
+      var KEYWORD_RE = new RegExp('\\b(' + KEYWORDS.join('|') + ')\\b', 'g');
+      var TOKEN_RE = /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*")|(@[A-Za-z_][A-Za-z0-9_]*)|\b(\d+(?:\.\d+)?[fFlL]?)\b|\b([A-Z][A-Za-z0-9_]*)\b/g;
+      function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+      function highlight(src) {
+        var escaped = escapeHtml(src);
+        escaped = escaped.replace(TOKEN_RE, function (m, com, block, str, ann, num, type) {
+          if (com) return '<span class="tok-com">' + com + '</span>';
+          if (block) return '<span class="tok-com">' + block + '</span>';
+          if (str) return '<span class="tok-str">' + str + '</span>';
+          if (ann) return '<span class="tok-ann">' + ann + '</span>';
+          if (num) return '<span class="tok-num">' + num + '</span>';
+          if (type) return '<span class="tok-type">' + type + '</span>';
+          return m;
+        });
+        var parts = escaped.split(/(<span[^>]*>[\s\S]*?<\/span>)/g);
+        for (var i = 0; i < parts.length; i++) {
+          if (parts[i].indexOf('<span') === 0) continue;
+          parts[i] = parts[i].replace(KEYWORD_RE, '<span class="tok-kw">$1</span>');
+        }
+        return parts.join('');
+      }
+      document.querySelectorAll('pre > code').forEach(function (block) {
+        block.innerHTML = highlight(block.textContent);
+      });
+    })();
+  </script>
 </body>
 </html>
 ```
 
+**Phase 数が多い場合の TOC / `<details id="phaseN">` は Phase の数だけ機械的に増やす。**
+
 書き出したらブラウザで開く:
 
 ```bash
-open .claude-doc/YYYYMMDD-HHMMSS-{branch-slug}.html
+# workspace_root / repo_name はここでも再計算する（シェル変数は Bash 呼び出しをまたいで残らない）
+repo_toplevel="$(git rev-parse --show-toplevel)"
+open "$(dirname "$repo_toplevel")/.claude-doc/$(basename "$repo_toplevel")/YYYYMMDD-HHMMSS-{branch-slug}.html"
 ```
 
-ファイルパスをユーザーに報告する。
+ファイルパス（フルパス）をユーザーに報告する。
 
 ### Step 9: 承認の確認と修正サイクル
 
 HTML を開いた状態でユーザーに承認可否を求める:
 
 ```
-HTML プランをブラウザで開きました: .claude-doc/YYYYMMDD-HHMMSS-xxx.html
+HTML プランをブラウザで開きました: <workspace_root>/.claude-doc/<repo_name>/YYYYMMDD-HHMMSS-xxx.html
 
 この方針で実装を開始してよいですか？
 - 承認: そのまま実装に進みます
@@ -314,7 +439,7 @@ Phase 内の全ステップが完了したら、以下の2つのエージェン�
 途中で中断した場合は、既存の HTML プランファイルパスを指定して再開できる。HTML 内にステータスと Phase ごとの完了状況が記録されているため、続きから進められる。
 
 ```
-このプランの Phase 2 から再開してください: .claude-doc/20260510-180000-foo.html
+このプランの Phase 2 から再開してください: /Users/okabe/workspace/henry-workspace/.claude-doc/henry-backend/20260510-180000-foo.html
 ```
 
 のように Claude に直接指示すれば良い。
@@ -327,4 +452,4 @@ Phase 内の全ステップが完了したら、以下の2つのエージェン�
 - **ブランチ名はユーザーから必ず確認する**: 自動生成しない
 - **`EnterPlanMode` / `ExitPlanMode` は使わない**: cage + bypass permission 前提のため、プランモードに入ると追加の許可プロンプトが発生して開発体験が損なわれる
 - **HTML プランの修正は上書き更新**: 修正サイクルで新規ファイルを作らず、同じファイルを上書きしてブラウザで再読み込みしてもらう
-- **`.claude-doc/` はリポジトリにコミットしない**: global ignore 設定により自動的に追跡対象外
+- **プランは `<workspace_root>/.claude-doc/<repo_name>/`（リポジトリの1つ上の階層）に集約する**: リポジトリ自身の `<cwd>/.claude-doc/` には置かない（書き込めない場合のフォールバックを除く）。複数リポジトリを横断する作業でもプランが一箇所にまとまる。ホームディレクトリ直下は sandbox 環境で書き込み権限エラーになることがあるため使わない
