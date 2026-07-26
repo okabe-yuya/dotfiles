@@ -79,5 +79,7 @@
     "commit-commands@claude-plugins-official": true,
     "kotlin-lsp@claude-plugins-official": false
   },
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
 }
