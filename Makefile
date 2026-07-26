@@ -1,4 +1,4 @@
-.PHONY: all setup zsh tmux nvim git ghostty claude cage brew
+.PHONY: all setup zsh tmux nvim git ghostty claude cage herdr brew
 
 # 出力用 ANSI エスケープ
 H := \033[1;36m
@@ -24,7 +24,7 @@ endef
 all: setup brew
 
 # シンボリックリンクのセットアップだけ (brew は分離)
-setup: zsh tmux nvim git ghostty claude cage
+setup: zsh tmux nvim git ghostty claude cage herdr
 	@printf "\n$(B)✨ Setup completed!$(R)\n"
 
 zsh:
@@ -59,6 +59,12 @@ CAGE_CONFIG = $(HOME)/.config/cage/presets.yml
 cage:
 	$(call section,cage)
 	$(call link,$(HOME)/dotfiles/cage/presets.yml,$(CAGE_CONFIG))
+
+HERDR_CONFIG = $(HOME)/.config/herdr/config.toml
+
+herdr:
+	$(call section,herdr)
+	$(call link,$(HOME)/dotfiles/herdr/config.toml,$(HERDR_CONFIG))
 
 brew:
 	$(call section,brew)
