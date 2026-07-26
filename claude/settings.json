@@ -23,6 +23,17 @@
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/hunk-autolink.sh"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
