@@ -23,6 +23,17 @@
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/hunk-autolink.sh"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "matcher": "",
@@ -68,5 +79,7 @@
     "commit-commands@claude-plugins-official": true,
     "kotlin-lsp@claude-plugins-official": false
   },
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
 }
