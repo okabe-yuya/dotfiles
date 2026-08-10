@@ -13,7 +13,7 @@ font-style-bold = false
 font-style-italic = false
 font-style-bold-italic = false
 
-font-size = 15
+font-size = 13
 
 # Window Settings
 window-padding-x = 20
@@ -22,11 +22,15 @@ window-padding-color = extend-always
 window-padding-balance = true
 window-theme = ghostty
 
+
+background-opacity = 0.80
+macos-titlebar-style = transparent
+
 # Background Image
-background-image = "~/dotfiles/ghostty/images/peacock.jpg"
-background-image-opacity = 0.13
-background-image-fit = cover
-background-image-position = center
+# background-image = "~/dotfiles/ghostty/images/peacock.jpg"
+# background-image-opacity = 0.13
+# background-image-fit = cover
+# background-image-position = center
 
 macos-titlebar-style = native
 

@@ -93,3 +93,13 @@ vim.api.nvim_create_autocmd(
 
 -- 不要なプラグインを無効にする (netrw は lazy.nvim の disabled_plugins 側で無効化済み)
 vim.g.loaded_gzip = 1
+
+-- 背景を透過させる
+vim.cmd([[
+  highlight Normal guibg=none
+  highlight NonText guibg=none
+  highlight Normal ctermbg=none
+  highlight NonText ctermbg=none
+  highlight NormalNC guibg=none
+  highlight NormalSB guibg=none
+]])
