@@ -1,16 +1,16 @@
 ---
-name: start
+name: plan
 description: |
   指定したベースブランチを最新化して新規ブランチを作成し、Notion / Linear などのドキュメント
   URLや既存コードベースを参照しながら実装計画を HTML として作成・ブラウザで開く。
   ユーザーから承認があれば bypass permission モードのまま実装に進む。
-  「/start」「機能開発を始める」「タスクに着手する」などの要求時に使用。
+  「/plan」「プランを作って」「実装計画を立てて」などの要求時に使用。
 argument-hint: "<base-branch>"
 user-invocable: true
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, ToolSearch, WebFetch, TaskCreate, TaskUpdate
 ---
 
-# /start スキル
+# /plan スキル
 
 ベースブランチからの新規ブランチ作成 → HTML プラン作成・ブラウザ表示 → ユーザー承認 → 実装開始までを一気通貫で行うスキル。
 
@@ -168,6 +168,11 @@ Linear 公式の MCP ツールがあれば優先する。なければ `WebFetch`
   - サンプルコードは「実装イメージ」であることを明記し、実装時に既存コードとの整合を取る前提とする
 - **テスト方針**: 正常系・異常系・境界値で必要なテストケース
 
+**コメント欄の使い分け:**
+- **確認事項** → セレクトボックス（OK / 修正必要 / 質問あり / その他）。定型回答で素早く確認できる
+- **Phase** → テキストエリア直表示（`always-show`）。自由記入のみ
+- フィードバック反映後は `.comment-section.resolved` クラスを付けて「解決済み」表示にする
+
 ### Step 8: HTML プランの書き出しとブラウザ表示
 
 プランを HTML として `<workspace_root>/.claude-doc/<repo_name>/` 配下に書き出してブラウザで開く（Step 2 参照。リポジトリ自身の `<cwd>/.claude-doc/` には作らない。フォールバック時のみそちらを使う）。
@@ -249,6 +254,67 @@ date "+%Y%m%d-%H%M%S"
     details.phase[open] > summary::before, details.block[open] > summary::before { content: "▼ "; }
     details.phase > :last-child, details.block > :last-child { margin-bottom: 0; }
     summary .hook { font-weight: 400; color: #6a737d; font-size: .85em; margin-left: .4rem; }
+    /* コメント機能 */
+    .comment-section {
+      margin-top: 1rem; padding-top: .8rem; border-top: 1px dashed #d0d7de;
+    }
+    .comment-section.resolved {
+      opacity: .6; pointer-events: none;
+    }
+    .comment-section.resolved::before {
+      content: "解決済み"; display: inline-block; font-size: .8em; font-weight: 600;
+      color: #fff; background: #2da44e; padding: 1px 8px; border-radius: 10px; margin-bottom: .4rem;
+    }
+    .comment-form { margin-top: .5rem; }
+    .comment-form select {
+      width: 100%; padding: .4rem .5rem; border: 1px solid #d0d7de;
+      border-radius: 6px; font-size: .85em; font-family: inherit;
+      background: #fff; color: #1f2328; cursor: pointer;
+    }
+    .comment-form select:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74,144,226,.2); }
+    .comment-form textarea {
+      width: 100%; min-height: 60px; padding: .5rem; border: 1px solid #d0d7de;
+      border-radius: 6px; font-size: .85em; font-family: inherit; resize: vertical;
+      background: #fff; color: #1f2328; margin-top: .4rem; display: none;
+    }
+    .comment-form textarea.show { display: block; }
+    .comment-form textarea.always-show { display: block; margin-top: 0; }
+    .comment-form textarea:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74,144,226,.2); }
+    /* 承認バー（回答出力 + 承認ボタンを統合） */
+    .approval-bar {
+      position: sticky; bottom: 0; background: #f6f8fa; border-top: 2px solid #d0d7de;
+      padding: 1rem 1.5rem; z-index: 10;
+    }
+    .answer-output {
+      margin: 0 0 .8rem; padding: 0;
+    }
+    .answer-output pre {
+      background: #fff; border: 1px solid #e1e4e8; padding: .6rem .8rem; border-radius: 6px;
+      font-size: .82em; white-space: pre-wrap; min-height: 2em; margin: 0 0 .5rem;
+      max-height: 8em; overflow-y: auto;
+    }
+    .answer-output .empty-msg { color: #6a737d; font-style: italic; }
+    .answer-output .btn-row { display: flex; gap: .6rem; align-items: center; }
+    .answer-output button {
+      font-size: .82em; padding: .3rem .8rem; border-radius: 6px; cursor: pointer; border: none; font-weight: 600;
+    }
+    .answer-output .btn-copy { background: #1d63c9; color: #fff; }
+    .answer-output .btn-copy:hover { background: #1550a8; }
+    .answer-output .copy-result {
+      font-size: .82em; color: #2da44e; opacity: 0; transition: opacity .3s;
+    }
+    .answer-output .copy-result.visible { opacity: 1; }
+    .approval-actions {
+      display: flex; align-items: center; gap: 1rem; justify-content: flex-end;
+    }
+    .approval-actions button {
+      font-size: .95em; padding: .5rem 1.2rem; border-radius: 6px; cursor: pointer; border: none;
+      font-weight: 600;
+    }
+    .approval-actions .btn-approve { background: #2da44e; color: #fff; }
+    .approval-actions .btn-approve:hover { background: #218838; }
+    .approval-actions .btn-reject { background: #fff; color: #d9534f; border: 1px solid #d9534f; }
+    .approval-actions .btn-reject:hover { background: #fdf1f0; }
     /* 簡易シンタックスハイライト用トークン色（白基調前提。ダークモード分岐は持たせない） */
     pre .tok-com { color: #6a737d; font-style: italic; }
     pre .tok-str { color: #22863a; }
@@ -279,7 +345,22 @@ date "+%Y%m%d-%H%M%S"
 
   <!-- 確認事項があれば概要に目立つ形で配置。ブロッカーになり得るため埋もれさせない -->
   <h3 style="color:#d9534f;">確認事項（あれば）</h3>
-  <div class="confirm"><strong>1. {確認したいこと}</strong><br>{背景・提案する既定値}</div>
+  <div class="confirm">
+    <strong>1. {確認したいこと}</strong><br>{背景・提案する既定値}
+    <div class="comment-section">
+      <div class="comment-form">
+        <select onchange="updateAnswers()" data-label="確認事項 1">
+          <option value="" disabled selected>-- 回答を選択 --</option>
+          <option value="OK">OK（この方針で進めてよい）</option>
+          <option value="修正必要">修正必要</option>
+          <option value="質問あり">質問あり</option>
+          <option value="__other__">その他（自由入力）</option>
+        </select>
+        <textarea placeholder="詳細を入力..." oninput="updateAnswers()" onchange="updateAnswers()"></textarea>
+      </div>
+    </div>
+  </div>
+  <!-- 確認事項が複数ある場合は .confirm を追加。番号とラベルを変える -->
 
   <h3>実装ステップ一覧（クリックで詳細）</h3>
   <button class="expand-all" type="button" onclick="document.querySelectorAll('details').forEach(d => d.open = true)">すべて展開</button>
@@ -315,13 +396,104 @@ date "+%Y%m%d-%H%M%S"
     <pre><code>// path/to/File.kt（実装イメージ。実装時に既存コードとの整合を取る）
 ...
 </code></pre>
+    <div class="comment-section">
+      <div class="comment-form">
+        <textarea class="always-show" placeholder="コメントを入力..." data-label="Phase 1" oninput="updateAnswers()" onchange="updateAnswers()"></textarea>
+      </div>
+    </div>
   </details>
-  <!-- Phase 2, 3... も同様に <details class="phase"> で追加 -->
+  <!-- Phase 2, 3... も同様に <details class="phase"> で追加。Phase のコメントは常にテキストエリア直表示 -->
 
   <details class="block" id="test-policy">
     <summary>テスト方針（まとめ）</summary>
     <ul><li>正常系・異常系・境界値のテストケース</li></ul>
   </details>
+
+  <!-- 承認バー（回答コピー + 承認/修正） -->
+  <div class="approval-bar">
+    <div class="answer-output" id="answer-output">
+      <pre id="answer-text"><span class="empty-msg">コメントを入力すると、ここに出力されます</span></pre>
+      <div class="btn-row">
+        <button class="btn-copy" type="button" onclick="copyAllAnswers()">回答をコピー</button>
+        <span class="copy-result" id="copy-all-result"></span>
+      </div>
+    </div>
+    <div class="approval-actions">
+      <button class="btn-reject" type="button" onclick="sendApproval('reject')">修正要求</button>
+      <button class="btn-approve" type="button" onclick="sendApproval('approve')">承認して実装開始</button>
+    </div>
+  </div>
+
+  <script>
+    // セレクトボックスの「その他」表示切替（確認事項用）
+    document.querySelectorAll('.comment-form select').forEach(function (sel) {
+      sel.addEventListener('change', function () {
+        var ta = sel.closest('.comment-form').querySelector('textarea:not(.always-show)');
+        if (!ta) return;
+        if (sel.value === '__other__') { ta.classList.add('show'); ta.focus(); }
+        else { ta.classList.remove('show'); ta.value = ''; }
+      });
+    });
+    // 全コメント欄の回答を集約して出力エリアに反映
+    function updateAnswers() {
+      var title = document.title || 'プラン';
+      var lines = [];
+      // セレクトボックス（確認事項）
+      document.querySelectorAll('.comment-form select').forEach(function (sel) {
+        if (!sel.value) return;
+        var label = sel.getAttribute('data-label');
+        var ta = sel.closest('.comment-form').querySelector('textarea:not(.always-show)');
+        var answer = sel.value === '__other__' ? (ta ? ta.value.trim() : '') : sel.value;
+        if (answer) lines.push(label + ': ' + answer);
+      });
+      // テキストエリア直表示（Phase コメント）
+      document.querySelectorAll('.comment-form textarea.always-show').forEach(function (ta) {
+        var text = ta.value.trim();
+        if (!text) return;
+        var label = ta.getAttribute('data-label');
+        lines.push(label + ': ' + text);
+      });
+      var pre = document.getElementById('answer-text');
+      if (lines.length === 0) {
+        pre.innerHTML = '<span class="empty-msg">コメントを入力すると、ここに出力されます</span>';
+      } else {
+        pre.textContent = '[' + title + ']\n' + lines.join('\n');
+      }
+    }
+    function clipboardCopy(text) {
+      var tmp = document.createElement('textarea');
+      tmp.value = text;
+      tmp.style.position = 'fixed';
+      tmp.style.opacity = '0';
+      document.body.appendChild(tmp);
+      tmp.select();
+      document.execCommand('copy');
+      document.body.removeChild(tmp);
+    }
+    function copyAllAnswers() {
+      var pre = document.getElementById('answer-text');
+      var text = pre.textContent;
+      if (!text || pre.querySelector('.empty-msg')) { alert('回答を選択してください'); return; }
+      clipboardCopy(text);
+      var result = document.getElementById('copy-all-result');
+      result.textContent = 'Copied!';
+      result.classList.add('visible');
+      setTimeout(function () { result.classList.remove('visible'); }, 2000);
+    }
+    function sendApproval(type) {
+      var title = document.title || 'プラン';
+      var msg = type === 'approve'
+        ? '[' + title + '] 承認: この方針で実装を開始してください'
+        : '[' + title + '] 修正要求: ';
+      if (type === 'reject') {
+        var reason = prompt('修正内容を入力してください:');
+        if (!reason) return;
+        msg += reason;
+      }
+      clipboardCopy(msg);
+      alert('コピーしました。チャットに貼り付けてください。');
+    }
+  </script>
 
   <script>
     // 依存なしの簡易シンタックスハイライト（CDN 不可のオフライン環境向け。Kotlin 以外の言語でも
@@ -331,7 +503,10 @@ date "+%Y%m%d-%H%M%S"
         'public','protected','internal','open','abstract','override','return','when','if','else','for',
         'while','do','is','in','as','null','true','false','import','package','companion','by','const',
         'lateinit','this','super','inline','value','infix','operator','suspend','out','reified','where',
-        'try','catch','finally','throw','init','get','set','vararg','typealias'];
+        'try','catch','finally','throw','init','get','set','vararg','typealias',
+        'function','export','from','async','await','new','typeof','instanceof','void','delete',
+        'let','type','readonly','extends','implements','static','abstract','yield','of',
+        'switch','case','default','break','continue','debugger','with','do'];
       var KEYWORD_RE = new RegExp('\\b(' + KEYWORDS.join('|') + ')\\b', 'g');
       var TOKEN_RE = /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*")|(@[A-Za-z_][A-Za-z0-9_]*)|\b(\d+(?:\.\d+)?[fFlL]?)\b|\b([A-Z][A-Za-z0-9_]*)\b/g;
       function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
