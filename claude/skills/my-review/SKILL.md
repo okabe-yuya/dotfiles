@@ -1,13 +1,13 @@
 ---
 name: my-review
-description: 現在のPR/ブランチ差分を、自分のレビュー観点（コード品質・DDD・型設計・変更スコープ等）で分析し、指摘と修正案を提案する
-argument-hint: "[対象ブランチ（省略時はmain） または PR番号]"
+description: 現在の未コミット変更（またはPR/指定ブランチ差分）を、自分のレビュー観点（コード品質・DDD・型設計・変更スコープ等）で分析し、指摘と修正案を提案する
+argument-hint: "[省略時は未コミット変更 / 対象ブランチ / PR番号]"
 allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, TaskUpdate, TaskList
 ---
 
 # my-review — 自分のレビュー観点でのコードレビュースキル
 
-現在のブランチ差分（または指定PR）を、自分が実際のレビューで繰り返し指摘してきた観点で分析し、指摘と修正案を報告する。観点は過去の自己レビューコメントから抽出・重複統合したもの。
+**デフォルトでは現在の未コミット変更（working tree）** を、自分が実際のレビューで繰り返し指摘してきた観点で分析し、指摘と修正案を報告する。PR 番号やブランチ名を明示した場合のみ、そのコミット済み差分を対象にする。観点は過去の自己レビューコメントから抽出・重複統合したもの。
 
 ## 前提
 
@@ -20,13 +20,21 @@ allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, 
 
 ### Step 1: 差分の取得
 
+**デフォルト（引数なし）は「未コミットの working tree 変更」を対象にする。** コミット済み差分をレビューしたいときだけ、明示的に PR 番号かブランチ名を渡す。
+
 1. 引数の解釈:
-   - 数字のみ（例 `1234`）なら PR 番号とみなし `gh pr diff <番号>` / `gh pr view <番号>` を使う
-   - ブランチ名ならそれをベースに、省略時は `main` をベースとする
+   - **引数なし（デフォルト）**: 未コミットの作業ツリー変更を対象にする
+   - 数字のみ（例 `1234`）: PR 番号とみなし `gh pr diff <番号>` / `gh pr view <番号>` を使う
+   - ブランチ名: そのブランチをベースにしたコミット済み差分（`<base>...HEAD`）を対象にする
 2. 差分の取得:
-   - `git diff <base>...HEAD --name-only` で変更ファイル一覧
-   - `git diff <base>...HEAD` で全体差分
-3. 変更が無ければ「差分がありません」と報告して終了する
+   - **未コミット（デフォルト）**:
+     - `git status --porcelain` で変更ファイル一覧（tracked の変更 + 未追跡ファイル）
+     - `git diff HEAD` で tracked ファイルの差分（staged + unstaged の両方を含む）
+     - `git ls-files --others --exclude-standard` で未追跡ファイルを列挙し、各ファイルは新規追加として全内容を対象にする
+   - **PR 番号 / ブランチ指定時**:
+     - `git diff <base>...HEAD --name-only` で変更ファイル一覧
+     - `git diff <base>...HEAD` で全体差分
+3. 変更が無ければ「レビュー対象の差分がありません」と報告して終了する
 
 ### Step 2: 変更ファイルの分析
 
@@ -154,6 +162,8 @@ const apiKey = process.env.API_KEY;
 - **MEDIUM**: 改善を検討
 
 ### Step 5: ユーザーへの確認
+
+> **オーケストレータから「報告のみ」で呼ばれた場合**（例: `/oil` が指摘収集のために本スキルを呼ぶとき）は、Step 5・Step 6 をスキップし、Step 4 の指摘列挙で終了する。修正適用・ユーザー確認はオーケストレータ側に委ねる。
 
 1. 発見事項を提示後、`AskUserQuestion` でどの修正を適用するか確認する
 2. CRITICAL/HIGH がある場合は修正を強く推奨する旨を添える
