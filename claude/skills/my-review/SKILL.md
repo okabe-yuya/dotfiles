@@ -44,7 +44,7 @@ allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, 
 
 ### Step 3: レビューチェックリスト
 
-以下の観点で指摘を洗い出す。重大度は目安（プロジェクトルールに明記があればそちらを優先）。
+以下の観点で指摘を洗い出す。重大度は目安（プロジェクトルールに明記があればそちらを優先）。繰り返し出やすい観点の bad/good 例は `references/examples.md` にまとめてある。
 
 #### セキュリティ (CRITICAL)
 - シークレット、認証情報、APIキーのハードコード
@@ -67,7 +67,7 @@ allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, 
 - `private` 関数の3層以上のネスト呼び出し
 - 早期リターン・ガード節が使えるのに使っていない箇所
 - 関数分割が細かすぎないか（一度しか使わない/インライン可能な過剰な抽出）。逆に、既存と責務が異なる処理はまとめず関数に切り出して境界を明示しているか
-- 想定内の「不在」（データが見つからない等）を例外で落とさず、ユーザー向けのエラー通知（verify 等）で返しているか
+- 想定内の失敗（不在・不正入力・重複等）を例外で落とさず結果（Result／戻り値）で返しているか。ユーザー向け通知（verify 等）はドメインモデル・Factory・Repository でなく UseCase／入口層の責務にする（ドメイン層に通知責務を持ち込まない）
 - 実行中ジョブなど処理の前提条件を、開始前に排他・検証しているか
 
 #### DDD準拠 (HIGH)
@@ -78,12 +78,16 @@ allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, 
 - Repositoryの実装が別のRepositoryを使っていないか
 - デメテルの法則に違反していないか（3段階以上のメソッドチェーン）
 - レイヤー間の依存方向が外から内へ向いているか
+- apis／proto／gRPC 由来の型（StoreValue・OptionalInput 等）や生成物の値をドメインモデルにそのまま持ち込んでいないか（境界でドメインの型へ変換する）。proto で nullable な値を `requireNotNull` で潰さず、nullable のまま持たせて意味を型に出す
+- 区分・対象判定などのドメイン知識を呼び出し側にベタ書きせず、対象の型のメソッドや専用ドメインサービスにカプセル化しているか（判定に必要な値は引数で渡し実装側で判定させる。凝集度とテスト容易性が上がる）
 - 認証コンテキスト（authContext / GraphQLContext）を UseCase 以下のレイヤーに渡していないか（GraphQL/Controller で organizationId・userId 等の値に変換してから渡す）
 - トランザクション境界が UseCase / ApplicationService 以上にあるか（Repository 実装で `db.transaction` を張っていないか）
 - 1 つの UseCase が単一の公開メソッドに絞られているか（別責務を既存 UseCase に相乗りさせず、新規 UseCase を定義しているか）
 - Repository はドメインモデル（集約）を返しているか。参照専用の projection 型を新設せず、read でしか得られない値（DB 採番列等）はドメインモデルに nullable で持たせる
 - 単純な ID 引きの参照を adapter 層の raw クエリで書いていないか（複雑な参照は QueryService、単純な参照は Repository 経由のドメインサービスに）
 - 型が違うだけで引数が同じ near-identical なファクトリを量産していないか。生成ロジックは対象の型の companion に集約し、呼び出し側で組めるならモデル側ファクトリは作らない
+- ドメインモデルの不変条件は init/require で全生成経路を守っているか（Factory を設けても init は残す。`copy` 等の別経路をすり抜けさせない）。ID はモデル内部で発行し外部から渡さない
+- ユーザーに通知して直させる失敗は、Factory／状態遷移メソッドが Result 等の型で返し入口層でハンドリングしているか。検証は init に一元化し、Factory は init の例外を catch して Result に変換する（検証ロジックを二重化しない）。失敗を直すのが開発者＝バグなら init の例外のまま境界へ飛ばしてよい
 - 副作用を UseCase に直書きせず、ドメインイベント publish → 購読ハンドラでの永続化に寄せられないか。副作用専用の中間クラス（Recorder 等）を挟んでいないか
 - 書き込みトランザクションに認可チェック・他集約の read を巻き込んでいないか（tx は write と、同一 tx で成立させるべき副作用に絞る）
 - DB 採番・デフォルト値（CURRENT_TIMESTAMP 等）に頼らず、発行元が確定した値を永続化しているか。下流で使われない値を引数で受け取っていないか
@@ -109,6 +113,7 @@ allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, 
 - 自明な条件を名前に含めていないか（例: 常に組織スコープなら `...ByIdsAndOrganization` の `AndOrganization` は冗長 → `...ByIds`）
 - ID のフィールド・引数が「何の ID か」を型・文脈から特定できるか（曖昧な `id` でなく `executionId` 等、対応する型/返り値と用語を揃える）
 - 不要な間接・別名を挟んでいないか（ラッパーから取り出す一時変数を作らず、必要な値をコンストラクタ/引数で直接受け取る）
+- 複合条件・非自明な判定式を、意味の分かる説明変数に切り出して「何の判定か」を示しているか（`if (a.isX() || a.isY())` を名前付き変数へ。各要素を1つずつ変数化してコメントするのも可）
 - メンバー定義順序（override → private の順）: interface / 抽象メソッドを override しているクラス・object で、private なメソッド/プロパティを override メソッドより後に定義しているか。override 実装を読む際に読み手の視線が往復しないよう、override を先頭側にまとめ補助の private は後続に置く（どの実装クラスでも共通）
 - KDoc・コメントが実装と一致しているか（実装を変えてコメントが stale になっていないか）
 - DAO の KDoc は他 DAO に倣い `@property` 形式で各列に付いているか（DB カラムコメントに反映される）
@@ -123,10 +128,12 @@ allowed-tools: Bash, Read, Edit, Grep, Glob, AskUserQuestion, Task, TaskCreate, 
 
 #### 型設計・拡張性 (MEDIUM)
 - 成否・区分を Boolean で表しているが、将来値が増える見込みがある場合に enum 化を検討したか（例: 成功/失敗の2値でも「既ロック」等の追加余地があるなら enum）
+- 区分・種別による分岐を `if (boolean)` や真偽式の判定関数で書いていないか。区分が増えたとき分類漏れをコンパイルエラーで検知できるよう、分岐そのものを else なしの網羅的 `when` で書く（判定を boolean 関数へ切り出すと呼び出し側が網羅性を失う）
 - 実態が常に 0/1 件の `List<T>` を単数（nullable）で表現できないか。基盤・下位層の型（配列カラム等）をそのまま公開層へ横流ししていないか
 - sentinel 値・フラグの多義的な合流がないか（詳細は implicit-multi-state 観点）
 - 期間・範囲を start/end のバラの引数・フィールドで持ち回っていないか（range 型で受け渡す）
 - null を `?: デフォルト値` で握りつぶしていないか。nullable のまま持たせ「なぜ null か／無い状態」を型に出しているか
+- 入力（GraphQL input・関数引数・データクラス）に安易な default 値／default 引数を付けていないか。想定しづらいケースを見越して nullable・default にせず、常に値が要るなら必須にする（default 値・default null の多用は避け、既定に流れて意図が隠れるのを防ぐ）
 
 #### 変更スコープ・後方互換 (HIGH)
 - PR のスコープを超える変更を混ぜていないか（バグ修正 PR での無関係なリファクタ、既存の副作用・ログ・イベント発行の挙動変更）。既存挙動を変える場合はリスクを明示し、必要なら別 PR に切り出す
