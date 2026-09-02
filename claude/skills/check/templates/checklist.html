@@ -1,0 +1,329 @@
+<!--
+  動作確認チェックリスト テンプレート（/check スキル用）
+  Artifact として publish する場合、<!doctype>/<html>/<head>/<body> は付けず、この内容をそのまま書く。
+  差し替えるのはコンテンツ（title / description / header / legend / section 群 / footer / script の KEY）だけ。
+  style と script はそのまま流用してよい。
+-->
+<title>◯◯ 動作確認</title>
+<meta name="description" content="◯◯（PR #____）の動作確認チェックリスト" />
+<style>
+  :root {
+    --bg: #f5f8f9;
+    --surface: #ffffff;
+    --surface-2: #eef3f5;
+    --ink: #16242e;
+    --muted: #576874;
+    --line: #dce5ea;
+    --accent: #0f766e;
+    --accent-soft: #d5efeb;
+    --tested: #1d4ed8;
+    --tested-soft: #e2e9ff;
+    --manual: #b0560a;
+    --manual-soft: #f8ecd8;
+    --done: #157347;
+    --shadow: 0 1px 2px rgba(16, 40, 55, .06), 0 6px 20px rgba(16, 40, 55, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d151d;
+      --surface: #15212c;
+      --surface-2: #1b2835;
+      --ink: #e6eef5;
+      --muted: #93a5b3;
+      --line: #26333f;
+      --accent: #2dd4bf;
+      --accent-soft: #103b37;
+      --tested: #86a7ff;
+      --tested-soft: #1a2848;
+      --manual: #e0a969;
+      --manual-soft: #3a2b14;
+      --done: #46c07d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d151d;
+    --surface: #15212c;
+    --surface-2: #1b2835;
+    --ink: #e6eef5;
+    --muted: #93a5b3;
+    --line: #26333f;
+    --accent: #2dd4bf;
+    --accent-soft: #103b37;
+    --tested: #86a7ff;
+    --tested-soft: #1a2848;
+    --manual: #e0a969;
+    --manual-soft: #3a2b14;
+    --done: #46c07d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 840px; margin: 0 auto; padding: 32px 20px 96px; }
+
+  header { margin-bottom: 8px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  h1 { font-size: 26px; line-height: 1.25; margin: 0 0 6px; text-wrap: balance; letter-spacing: .01em; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0; }
+  .sub a { color: var(--accent); text-decoration: none; }
+  .sub a:hover { text-decoration: underline; }
+
+  /* progress */
+  .progress {
+    position: sticky; top: 0; z-index: 5;
+    margin: 22px 0 26px; padding: 14px 16px;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+  }
+  .progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .progress-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .progress-count { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .progress-count b { color: var(--accent); font-size: 19px; }
+  .bar { height: 7px; border-radius: 99px; background: var(--surface-2); margin-top: 10px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; width: 0%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--tested)));
+    transition: width .35s cubic-bezier(.4, 0, .2, 1); }
+  .reset {
+    margin-top: 10px; font: inherit; font-size: 12px; color: var(--muted);
+    background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  }
+  .reset:hover { color: var(--ink); }
+  .actions { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+  .actions .reset { margin-top: 0; }
+  .btn-copy {
+    font: inherit; font-size: 12.5px; font-weight: 600; color: #fff; background: var(--accent);
+    border: 0; border-radius: 8px; padding: 6px 12px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-copy:hover { filter: brightness(1.06); }
+  .btn-copy svg { width: 13px; height: 13px; stroke: #fff; stroke-width: 2; fill: none; }
+  .copy-msg { font-size: 12px; color: var(--done); font-weight: 600; opacity: 0; transition: opacity .25s; }
+  .copy-msg.show { opacity: 1; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 0 0 24px; font-size: 12.5px; color: var(--muted); }
+  .legend .badge { margin-right: 4px; }
+
+  section { margin-bottom: 26px; }
+  .sec-head { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+  .sec-num {
+    flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+    background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .sec-head h2 { font-size: 16px; margin: 0; letter-spacing: .01em; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+  .item { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 13px 16px; cursor: pointer; border-top: 1px solid var(--line); }
+  .item:first-child { border-top: 0; }
+  .item:hover { background: var(--surface-2); }
+
+  .item input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .box {
+    margin-top: 2px; flex: none; width: 20px; height: 20px; border-radius: 6px;
+    border: 2px solid var(--line); background: var(--surface);
+    display: grid; place-items: center; transition: all .15s ease;
+  }
+  .box svg { width: 12px; height: 12px; stroke: #fff; stroke-width: 3.2; fill: none; opacity: 0; transform: scale(.6); transition: all .15s ease; }
+  .item input:checked ~ .box { background: var(--done); border-color: var(--done); }
+  .item input:checked ~ .box svg { opacity: 1; transform: scale(1); }
+  .item input:focus-visible ~ .box { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .body .text { font-size: 14.5px; }
+  .item input:checked ~ .body .text { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 45%, transparent); }
+  .note { display: block; margin-top: 3px; font-size: 12.5px; color: var(--muted); }
+  .note code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em;
+    padding: 1.5px 8px; border-radius: 99px; vertical-align: middle; white-space: nowrap;
+  }
+  .badge.tested { background: var(--tested-soft); color: var(--tested); }
+  .badge.manual { background: var(--manual-soft); color: var(--manual); }
+  .body .badge { margin-left: 8px; position: relative; top: -1px; }
+
+  footer { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  footer p { margin: 0 0 6px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">動作確認</div>
+    <h1>◯◯ の動作確認</h1>
+    <!-- 対象（PR / ブランチ / 環境）へのリンク。環境（プレビュー/ローカル/staging）も書く -->
+    <p class="sub">PR <a href="https://github.com/OWNER/REPO/pull/____">REPO #____</a> ・ ◯◯環境で各項目を確認してチェック</p>
+  </header>
+
+  <div class="progress">
+    <div class="progress-row">
+      <span class="progress-label">確認の進捗</span>
+      <span class="progress-count"><b id="done">0</b> / <span id="total">0</span> 完了</span>
+    </div>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="actions">
+      <button class="btn-copy" id="copy-md" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Markdown をコピー</button>
+      <button class="reset" id="reset" type="button">チェックをすべてリセット</button>
+      <span class="copy-msg" id="copy-msg">コピーしました</span>
+    </div>
+  </div>
+
+  <!-- 使うバッジだけ残す。テスト済みが無いならこの legend を「要目視」の1行にする -->
+  <div class="legend">
+    <span><span class="badge tested">テスト済み</span> 自動テストで担保（実機の回帰確認は軽め）</span>
+    <span><span class="badge manual">要目視</span> 実機での目視確認が必要</span>
+  </div>
+
+  <!-- ===== セクションはここから。観点ごとに <section> を並べる ===== -->
+  <section>
+    <div class="sec-head"><div class="sec-num">1</div><h2>◯◯機能（正常系）</h2></div>
+    <div class="card" data-list>
+      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">◯◯を操作すると<b>△△になる</b><span class="badge manual">要目視</span></span></span></label>
+      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">◯◯のとき<b>△△が表示される</b><span class="badge tested">テスト済み</span></span><span class="note">補足・手順・スキップ条件・<code>file:line</code> など</span></span></label>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><div class="sec-num">2</div><h2>境界・異常系</h2></div>
+    <div class="card" data-list>
+      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">上限を超えると保存でエラー「△△」が出る<span class="badge tested">テスト済み</span></span></span></label>
+      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">必須項目を空のまま保存すると必須エラーが出る<span class="badge tested">テスト済み</span></span></span></label>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><div class="sec-num">3</div><h2>回帰確認（既存挙動が壊れていないこと）</h2></div>
+    <div class="card" data-list>
+      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">既存の◯◯が従来どおり動く<span class="badge manual">要目視</span></span></span></label>
+      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">登録 → 保存 → 再表示で入力内容が保持される<span class="badge manual">要目視</span></span></span></label>
+    </div>
+  </section>
+  <!-- ===== セクションここまで ===== -->
+
+  <footer>
+    <p><span class="badge tested">テスト済み</span> は自動テストで担保済みのため、実機では <span class="badge manual">要目視</span> を優先して確認すると効率的です。</p>
+    <p>チェック状態はこのブラウザに自動保存されます。</p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    // KEY はチェックリストごとに一意な値に変える（別のチェックリストと保存が混ざらないように）
+    var KEY = "check-REPLACE-ME-v1";
+    var items = Array.prototype.slice.call(document.querySelectorAll(".item input"));
+    items.forEach(function (input, i) { input.dataset.k = "i" + i; });
+
+    var saved = {};
+    try { saved = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { saved = {}; }
+
+    var totalEl = document.getElementById("total");
+    var doneEl = document.getElementById("done");
+    var fillEl = document.getElementById("fill");
+
+    function render() {
+      var done = items.filter(function (x) { return x.checked; }).length;
+      doneEl.textContent = done;
+      totalEl.textContent = items.length;
+      fillEl.style.width = items.length ? (done / items.length * 100) + "%" : "0%";
+    }
+    function persist() {
+      var obj = {};
+      items.forEach(function (x) { if (x.checked) obj[x.dataset.k] = 1; });
+      try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) { /* private mode 等は無視 */ }
+    }
+
+    items.forEach(function (input) {
+      if (saved[input.dataset.k]) input.checked = true;
+      input.addEventListener("change", function () { persist(); render(); });
+    });
+
+    document.getElementById("reset").addEventListener("click", function () {
+      items.forEach(function (x) { x.checked = false; });
+      persist(); render();
+    });
+
+    // チェックリストを Markdown（GFM のタスクリスト）に変換する。チェック状態も [x]/[ ] に反映する
+    function buildMarkdown() {
+      var lines = [];
+      var h1 = document.querySelector("h1");
+      if (h1) lines.push("# " + h1.textContent.trim());
+      var sub = document.querySelector(".sub");
+      if (sub) {
+        var s = sub.textContent.trim().replace(/\s+/g, " ");
+        var a = sub.querySelector("a");
+        if (a && a.getAttribute("href")) {
+          var label = a.textContent.trim();
+          s = s.replace(label, "[" + label + "](" + a.getAttribute("href") + ")");
+        }
+        if (s) { lines.push(""); lines.push(s); }
+      }
+      Array.prototype.forEach.call(document.querySelectorAll("section"), function (sec) {
+        var num = sec.querySelector(".sec-num");
+        var h2 = sec.querySelector(".sec-head h2");
+        if (h2) {
+          lines.push("");
+          lines.push("## " + (num ? num.textContent.trim() + ". " : "") + h2.textContent.trim());
+        }
+        Array.prototype.forEach.call(sec.querySelectorAll(".item"), function (item) {
+          var input = item.querySelector("input");
+          var textEl = item.querySelector(".body .text");
+          if (!textEl) return;
+          // バッジ（テスト済み/要目視）は本文から外して末尾に括弧で付ける
+          var clone = textEl.cloneNode(true);
+          var badges = [];
+          Array.prototype.forEach.call(clone.querySelectorAll(".badge"), function (b) {
+            badges.push(b.textContent.trim());
+            b.parentNode.removeChild(b);
+          });
+          var text = clone.textContent.trim().replace(/\s+/g, " ");
+          var line = "- [" + (input && input.checked ? "x" : " ") + "] " + text;
+          if (badges.length) line += " (" + badges.join(" / ") + ")";
+          lines.push(line);
+          var note = item.querySelector(".body .note");
+          if (note) {
+            var n = note.textContent.trim().replace(/\s+/g, " ");
+            if (n) lines.push("  - " + n);
+          }
+        });
+      });
+      return lines.join("\n") + "\n";
+    }
+
+    function legacyCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch (e) { /* noop */ }
+      document.body.removeChild(ta);
+    }
+    function copyText(text, done) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { legacyCopy(text); done(); });
+      } else { legacyCopy(text); done(); }
+    }
+
+    var copyBtn = document.getElementById("copy-md");
+    var copyMsg = document.getElementById("copy-msg");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        copyText(buildMarkdown(), function () {
+          if (!copyMsg) return;
+          copyMsg.classList.add("show");
+          setTimeout(function () { copyMsg.classList.remove("show"); }, 1800);
+        });
+      });
+    }
+
+    render();
+  })();
+</script>
