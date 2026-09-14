@@ -39,11 +39,11 @@ done
 
 # lua 以下を再帰的にリンク
 find "$DOTFILES/lua" -type d | while read -r dir; do
-    rel="${dir#$DOTFILES/}"
+    rel="${dir#"$DOTFILES"/}"
     mkdir -p "$NVIMCONF/$rel"
 done
 
 find "$DOTFILES/lua" -type f | while read -r file; do
-    rel="${file#$DOTFILES/}"
+    rel="${file#"$DOTFILES"/}"
     link "$file" "$NVIMCONF/$rel"
 done
