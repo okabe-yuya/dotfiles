@@ -40,6 +40,44 @@ return {
         filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
       })
 
+      -- kotlin-lsp: root が buildSrc に落ちると precompiled script plugin の import が
+      -- freeCompilerArgs 評価で失敗するため、buildSrc を除いた最上位 (henry-backend) を root にする
+      vim.lsp.config('kotlin_lsp', {
+        -- Gradle import を JBR(Java25) でなく henry-backend が使う JDK(Corretto21) で走らせる
+        -- (JAVA_HOME 未設定だと LS 自身の JBR で import され source set が空になる問題の実験)
+        cmd_env = { JAVA_HOME = '/Users/okabe/Library/Java/JavaVirtualMachines/corretto-21.0.3/Contents/Home' },
+        -- kotlin-lsp のシンボル解決に使う JDK も Corretto21 に明示 (initializationOptions.defaultJdk)
+        -- cmd_env(=Gradle import 用 JVM) と揃え、bundled JBR25 由来の解決ズレを避ける
+        init_options = {
+          defaultJdk = '/Users/okabe/Library/Java/JavaVirtualMachines/corretto-21.0.3/Contents/Home',
+          skipImport = false,
+        },
+        root_dir = function(bufnr, on_dir)
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          if fname == '' then return end
+          local matches = vim.fs.find({ 'settings.gradle.kts', 'settings.gradle' }, {
+            path = vim.fs.dirname(fname), upward = true, limit = math.huge,
+          })
+          local root
+          for _, m in ipairs(matches) do
+            local dir = vim.fs.dirname(m)
+            if vim.fn.fnamemodify(dir, ':t') ~= 'buildSrc' then root = dir end
+          end
+          root = root or (matches[1] and vim.fs.dirname(matches[1]))
+          if root then on_dir(root) end
+        end,
+      })
+
+      -- gd(定義)/gD(宣言) は Neovim 0.11 の LSP デフォルトに無いので明示登録
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('MyLspKeymaps', { clear = true }),
+        callback = function(args)
+          local opts = { buffer = args.buf, silent = true }
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+          vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+        end,
+      })
+
       -- LSP server の有効化
       vim.lsp.enable({
         "lua_ls",
