@@ -1,4 +1,4 @@
-.PHONY: all setup zsh tmux nvim git ghostty claude cage herdr brew
+.PHONY: all setup zsh tmux nvim git ghostty claude cage herdr brew kotlin-lsp lint
 
 # 出力用 ANSI エスケープ
 H := \033[1;36m
@@ -71,4 +71,24 @@ brew:
 	@brew bundle --file=$(HOME)/dotfiles/Brewfile
 	@if [ -f $(HOME)/dotfiles/Brewfile.local ]; then \
 		brew bundle --file=$(HOME)/dotfiles/Brewfile.local; \
+	fi
+
+# kotlin-lsp の最新ビルドへの貼り替え (約30日で失効するため都度実行する)
+# 360MB 級の DL を伴うため setup には含めず、必要なときだけ叩く
+# 強制再取得: make kotlin-lsp ARGS=--force
+kotlin-lsp:
+	$(call section,kotlin-lsp)
+	@scripts/kotlin-lsp-update.sh $(ARGS)
+
+# scripts/ 配下のシェルスクリプトを静的検査する (bash -n + shellcheck)
+# shellcheck 未導入なら bash -n のみに縮退する
+lint:
+	$(call section,lint)
+	@for f in scripts/*.sh; do \
+		bash -n "$$f" && printf "  $(G)✓$(R) bash -n %s\n" "$$f"; \
+	done
+	@if command -v shellcheck >/dev/null 2>&1; then \
+		shellcheck scripts/*.sh && printf "  $(G)✓$(R) shellcheck passed\n"; \
+	else \
+		printf "  (shellcheck 未導入: brew install shellcheck で有効化)\n"; \
 	fi

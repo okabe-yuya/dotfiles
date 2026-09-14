@@ -52,8 +52,9 @@ brew "python@3.9"
 # ===================
 # LSP
 # ===================
-tap "jetbrains/utils"
-brew "jetbrains/utils/kotlin-lsp"
+# kotlin-lsp は brew では管理しない。
+# ビルドが約30日で失効する (intellij-server has expired) ため、月イチで最新へ
+# 貼り替える運用が必要で、それを scripts/kotlin-lsp-update.sh (make kotlin-lsp) に集約している。
 
 # ===================
 # Rust
@@ -104,6 +105,7 @@ brew "watchman"                      # ファイル変更監視 (React Native)
 brew "curl"
 brew "ffmpeg"
 brew "fswatch"                       # ファイル変更監視
+brew "shellcheck"                    # シェルスクリプトの静的解析 (make lint)
 
 # ===================
 # Casks
