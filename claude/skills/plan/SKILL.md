@@ -14,7 +14,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, ToolSearch,
 
 ベースブランチからの新規ブランチ作成 → HTML プラン作成・ブラウザ表示 → ユーザー承認 → 実装開始までを一気通貫で行うスキル。
 
-**重要:** このスキルは cage + `--dangerously-skip-permissions`（bypass permission）モードでの利用を前提としている。`EnterPlanMode` は使わず、プランは HTML ファイルとして `<workspace_root>/.claude-doc/<repo_name>/` に書き出してブラウザで開き、ユーザーからの承認後はそのまま bypass permission モードで実装を続ける。
+**重要:** このスキルは `--dangerously-skip-permissions`（bypass permission）モードでの利用を前提としている。`EnterPlanMode` は使わず、プランは HTML ファイルとして `<workspace_root>/.claude-doc/<repo_name>/` に書き出してブラウザで開き、ユーザーからの承認後はそのまま bypass permission モードで実装を続ける。
 
 ## 引数
 
@@ -625,6 +625,6 @@ Phase 内の全ステップが完了したら、以下の2つのエージェン�
 
 - **未コミット変更がある状態では実行しない**: ブランチ切替時に変更が紛れ込むのを防ぐ
 - **ブランチ名はユーザーから必ず確認する**: 自動生成しない
-- **`EnterPlanMode` / `ExitPlanMode` は使わない**: cage + bypass permission 前提のため、プランモードに入ると追加の許可プロンプトが発生して開発体験が損なわれる
+- **`EnterPlanMode` / `ExitPlanMode` は使わない**: bypass permission 前提のため、プランモードに入ると追加の許可プロンプトが発生して開発体験が損なわれる
 - **HTML プランの修正は上書き更新**: 修正サイクルで新規ファイルを作らず、同じファイルを上書きしてブラウザで再読み込みしてもらう
 - **プランは `<workspace_root>/.claude-doc/<repo_name>/`（リポジトリの1つ上の階層）に集約する**: リポジトリ自身の `<cwd>/.claude-doc/` には置かない（書き込めない場合のフォールバックを除く）。複数リポジトリを横断する作業でもプランが一箇所にまとまる。ホームディレクトリ直下は sandbox 環境で書き込み権限エラーになることがあるため使わない

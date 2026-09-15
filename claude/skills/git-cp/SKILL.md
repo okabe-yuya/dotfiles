@@ -65,7 +65,7 @@ allowed-tools: Read, Glob, Grep, Bash
 - 新しい論理単位（別機能・独立した修正） → 新規コミット
 
 **新規コミットのグルーピング基準:**
-- **同じ機能領域**: 関連する設定・実装・テストは1コミットにまとめる（例: `cage/presets.yml` + `Makefile`の cage ターゲット + `zshrc`の cage 用 export）
+- **同じ機能領域**: 関連する設定・実装・テストは1コミットにまとめる（例: `scripts/kotlin-lsp-update.sh` + `Makefile`の kotlin-lsp ターゲット + `Brewfile`の関連エントリ）
 - **テストとプロダクションコード**: 同じ機能の追加なら同じコミット
 - **独立した別機能**: 別コミット
 - **無関係なフォーマット変更**: 別コミットに切り出す
