@@ -83,7 +83,7 @@ allowed-tools: Read, Glob, Grep, Bash
 以下の計画で実行します:
 
 [fixup]
-1. <sha> "feat: cageの導入" に fixup — cage/presets.yml の typo 修正
+1. <sha> "feat: ghostty の導入" に fixup — ghostty/config の typo 修正
 2. <sha> "feat: workspaceスクリプトを追加" に fixup — workspace/run.sh の権限修正
 
 [新規コミット]
