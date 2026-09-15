@@ -112,5 +112,4 @@ brew "shellcheck"                    # シェルスクリプトの静的解析 (
 # ===================
 cask "chromium"
 cask "font-jetbrains-mono-nerd-font"
-cask "warashi/tap/cage"
 

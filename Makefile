@@ -1,4 +1,4 @@
-.PHONY: all setup zsh tmux nvim git ghostty claude cage herdr brew kotlin-lsp lint
+.PHONY: all setup zsh tmux nvim git ghostty claude brew kotlin-lsp lint
 
 # 出力用 ANSI エスケープ
 H := \033[1;36m
@@ -24,7 +24,7 @@ endef
 all: setup brew
 
 # シンボリックリンクのセットアップだけ (brew は分離)
-setup: zsh tmux nvim git ghostty claude cage herdr
+setup: zsh tmux nvim git ghostty claude
 	@printf "\n$(B)✨ Setup completed!$(R)\n"
 
 zsh:
@@ -53,18 +53,6 @@ ghostty:
 claude:
 	$(call section,claude)
 	@scripts/make-claude.sh
-
-CAGE_CONFIG = $(HOME)/.config/cage/presets.yml
-
-cage:
-	$(call section,cage)
-	$(call link,$(HOME)/dotfiles/cage/presets.yml,$(CAGE_CONFIG))
-
-HERDR_CONFIG = $(HOME)/.config/herdr/config.toml
-
-herdr:
-	$(call section,herdr)
-	$(call link,$(HOME)/dotfiles/herdr/config.toml,$(HERDR_CONFIG))
 
 brew:
 	$(call section,brew)
