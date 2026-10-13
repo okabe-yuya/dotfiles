@@ -173,7 +173,7 @@
     <div class="bar"><span id="fill"></span></div>
     <div class="actions">
       <button class="btn-copy" id="copy-md" type="button"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Markdown をコピー</button>
-      <button class="reset" id="reset" type="button">チェックをすべてリセット</button>
+      <button class="reset" id="reset" type="button">チェックを初期状態に戻す</button>
       <span class="copy-msg" id="copy-msg">コピーしました</span>
     </div>
   </div>
@@ -189,15 +189,15 @@
     <div class="sec-head"><div class="sec-num">1</div><h2>◯◯機能（正常系）</h2></div>
     <div class="card" data-list>
       <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">◯◯を操作すると<b>△△になる</b><span class="badge manual">要目視</span></span></span></label>
-      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">◯◯のとき<b>△△が表示される</b><span class="badge tested">テスト済み</span></span><span class="note">補足・手順・スキップ条件・<code>file:line</code> など</span></span></label>
+      <label class="item"><input type="checkbox" checked /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">◯◯のとき<b>△△が表示される</b><span class="badge tested">テスト済み</span></span><span class="note">補足・手順・スキップ条件・<code>file:line</code> など</span></span></label>
     </div>
   </section>
 
   <section>
     <div class="sec-head"><div class="sec-num">2</div><h2>境界・異常系</h2></div>
     <div class="card" data-list>
-      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">上限を超えると保存でエラー「△△」が出る<span class="badge tested">テスト済み</span></span></span></label>
-      <label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">必須項目を空のまま保存すると必須エラーが出る<span class="badge tested">テスト済み</span></span></span></label>
+      <label class="item"><input type="checkbox" checked /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">上限を超えると保存でエラー「△△」が出る<span class="badge tested">テスト済み</span></span></span></label>
+      <label class="item"><input type="checkbox" checked /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">必須項目を空のまま保存すると必須エラーが出る<span class="badge tested">テスト済み</span></span></span></label>
     </div>
   </section>
 
@@ -211,7 +211,7 @@
   <!-- ===== セクションここまで ===== -->
 
   <footer>
-    <p><span class="badge tested">テスト済み</span> は自動テストで担保済みのため、実機では <span class="badge manual">要目視</span> を優先して確認すると効率的です。</p>
+    <p><span class="badge tested">テスト済み</span> は自動テストで担保済みのため、最初からチェック済みにしています。実機では <span class="badge manual">要目視</span> を優先して確認してください。</p>
     <p>チェック状態はこのブラウザに自動保存されます。</p>
   </footer>
 </div>
@@ -236,23 +236,38 @@
       totalEl.textContent = items.length;
       fillEl.style.width = items.length ? (done / items.length * 100) + "%" : "0%";
     }
+    // チェックの有無を両方保存する。保存が無い項目は HTML の初期状態（テスト済みは checked）に従うので、
+    // テスト済みの項目を手で外しても再読み込みで勝手に戻らない
     function persist() {
       var obj = {};
-      items.forEach(function (x) { if (x.checked) obj[x.dataset.k] = 1; });
+      items.forEach(function (x) { obj[x.dataset.k] = x.checked ? 1 : 0; });
       try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) { /* private mode 等は無視 */ }
     }
 
     items.forEach(function (input) {
-      if (saved[input.dataset.k]) input.checked = true;
+      var k = input.dataset.k;
+      if (Object.prototype.hasOwnProperty.call(saved, k)) input.checked = saved[k] === 1;
       input.addEventListener("change", function () { persist(); render(); });
     });
 
+    // リセットは初期状態（テスト済みの項目だけチェック済み）に戻す
     document.getElementById("reset").addEventListener("click", function () {
-      items.forEach(function (x) { x.checked = false; });
+      items.forEach(function (x) { x.checked = x.defaultChecked; });
       persist(); render();
     });
 
-    // チェックリストを Markdown（GFM のタスクリスト）に変換する。チェック状態も [x]/[ ] に反映する
+    // チェックリストを Markdown（セクションごとの表）に変換する。
+    // 列は「チェック（✅ / -）」「確認方法（バッジ: テスト済み → 単体テスト、要目視 → 手動実施）」「確認項目」「補足」
+    function cell(text) {
+      return text.replace(/\s+/g, " ").replace(/\|/g, "\\|").trim();
+    }
+    function checkMark(item) {
+      var input = item.querySelector("input");
+      return input && input.checked ? "✅" : "-";
+    }
+    function methodOf(item) {
+      return item.querySelector(".badge.tested") ? "単体テスト" : "手動実施";
+    }
     function buildMarkdown() {
       var lines = [];
       var h1 = document.querySelector("h1");
@@ -260,11 +275,10 @@
       var sub = document.querySelector(".sub");
       if (sub) {
         var s = sub.textContent.trim().replace(/\s+/g, " ");
-        var a = sub.querySelector("a");
-        if (a && a.getAttribute("href")) {
+        Array.prototype.forEach.call(sub.querySelectorAll("a"), function (a) {
           var label = a.textContent.trim();
-          s = s.replace(label, "[" + label + "](" + a.getAttribute("href") + ")");
-        }
+          if (label && a.getAttribute("href")) s = s.replace(label, "[" + label + "](" + a.getAttribute("href") + ")");
+        });
         if (s) { lines.push(""); lines.push(s); }
       }
       Array.prototype.forEach.call(document.querySelectorAll("section"), function (sec) {
@@ -274,26 +288,17 @@
           lines.push("");
           lines.push("## " + (num ? num.textContent.trim() + ". " : "") + h2.textContent.trim());
         }
+        lines.push("");
+        lines.push("| チェック | 確認方法 | 確認項目 | 補足 |");
+        lines.push("|---|---|---|---|");
         Array.prototype.forEach.call(sec.querySelectorAll(".item"), function (item) {
-          var input = item.querySelector("input");
           var textEl = item.querySelector(".body .text");
           if (!textEl) return;
-          // バッジ（テスト済み/要目視）は本文から外して末尾に括弧で付ける
+          // バッジは確認方法の列に反映するので、本文からは外す
           var clone = textEl.cloneNode(true);
-          var badges = [];
-          Array.prototype.forEach.call(clone.querySelectorAll(".badge"), function (b) {
-            badges.push(b.textContent.trim());
-            b.parentNode.removeChild(b);
-          });
-          var text = clone.textContent.trim().replace(/\s+/g, " ");
-          var line = "- [" + (input && input.checked ? "x" : " ") + "] " + text;
-          if (badges.length) line += " (" + badges.join(" / ") + ")";
-          lines.push(line);
+          Array.prototype.forEach.call(clone.querySelectorAll(".badge"), function (b) { b.parentNode.removeChild(b); });
           var note = item.querySelector(".body .note");
-          if (note) {
-            var n = note.textContent.trim().replace(/\s+/g, " ");
-            if (n) lines.push("  - " + n);
-          }
+          lines.push("| " + checkMark(item) + " | " + methodOf(item) + " | " + cell(clone.textContent) + " | " + (note ? cell(note.textContent) : "") + " |");
         });
       });
       return lines.join("\n") + "\n";

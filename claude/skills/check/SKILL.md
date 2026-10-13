@@ -47,7 +47,8 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Skill, Artifact, WebFetch, S
 - **境界・異常系**: 入力上限ちょうど/超過・必須/空値・エラーメッセージ文言・重複・権限など
 - **回帰確認**: 触った周辺の既存挙動が壊れていないか（最後に 1 セクション）
 - 各項目にバッジを付ける:
-  - `テスト済み`: unit / component / 結合テストで担保済み（＝実機での回帰確認は軽めでよい）。**実際にそのテストが存在する項目にだけ付ける**
+  - `テスト済み`: unit / component / 結合テストで担保済み（＝実機での回帰確認は軽めでよい）。**実際にそのテストが存在する項目にだけ付ける**。
+    **テスト済みの項目は、最初からチェック済み（`<input type="checkbox" checked />`）にする**。確認する人が `要目視` に集中できるようにするため
   - `要目視`: 自動テストがない、または実機でしか確認できない（描画・ツールチップ文言・レイアウト・PDF/印刷・保存→再表示の往復・E2E 的挙動）
 - `note`（補足）に、手順・確認すべき文言・スキップ条件・`file:line` を書く
 
@@ -64,18 +65,26 @@ style（白基調＋ダーク対応）・進捗バー・凡例・localStorage �
 - `.eyebrow` / `h1` / `.sub` … 見出しと対象（PR/ブランチへのリンク）
 - `.legend` … 使うバッジだけ残す（`テスト済み` が無い変更なら `要目視` の 1 行に減らす）
 - 各 `<section>` … `sec-num`（連番）＋ `h2`（観点名）＋ `.card` 内の `.item` 群
-- `footer` … 補足（テスト済みの担保範囲・チェックは自動保存される旨）
+- `footer` … 補足（テスト済みの担保範囲・テスト済みは最初からチェック済みである旨・チェックは自動保存される旨）
 
 item のマークアップ（テンプレートの 1 行 `<label class="item">…</label>` を踏襲）:
 
 ```html
-<label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">操作して<b>期待結果</b>になる<span class="badge tested">テスト済み</span></span><span class="note">補足・手順・スキップ条件</span></span></label>
+<!-- テスト済み: 最初からチェック済みにする -->
+<label class="item"><input type="checkbox" checked /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">操作して<b>期待結果</b>になる<span class="badge tested">テスト済み</span></span><span class="note">補足・手順・スキップ条件</span></span></label>
+<!-- 要目視: 未チェックで出す -->
+<label class="item"><input type="checkbox" /><span class="box"><svg viewBox="0 0 14 14"><polyline points="2,7.5 6,11 12,3.5"/></svg></span><span class="body"><span class="text">操作して<b>期待結果</b>になる<span class="badge manual">要目視</span></span></span></label>
 ```
 
 - 強調は `<b>`、補足は `<span class="note">`（`code` 可）、バッジは `<span class="badge tested">` / `<span class="badge manual">`
+- **`テスト済み` バッジの項目には必ず `checked` を付け、`要目視` には付けない**（バッジと初期チェックを一致させる）。
+  テンプレートのスクリプトは、保存が無い項目を HTML の初期状態に従わせ、チェックの有無を両方保存する。
+  そのため、テスト済みの項目を手で外しても再読み込みで戻らない。「チェックを初期状態に戻す」ボタンもこの初期状態に戻す
 
-テンプレートには **「Markdown をコピー」ボタン**（GFM タスクリスト形式で出力。チェック状態を `[x]`/`[ ]`、
-バッジを `(テスト済み)` 等の接尾辞、note をサブ箇条書きに変換）が組み込み済みで、差し替え不要。
+テンプレートには **「Markdown をコピー」ボタン**が組み込み済みで、差し替え不要。セクションごとに
+`| チェック | 確認方法 | 確認項目 | 補足 |` の表を出力する。チェックはチェック済みなら `✅`、未チェックなら `-`。
+確認方法はバッジから決まり、`テスト済み` なら「単体テスト」、`要目視` なら「手動実施」
+（どの手段で確認したかを PR などに残せるようにするため）。
 ただし script 内の `KEY`（localStorage のキー）はチェックリストごとに一意な値へ変えること（別の
 チェックリストと保存が混ざらないように）。
 
