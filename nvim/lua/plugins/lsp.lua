@@ -40,16 +40,20 @@ return {
         filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
       })
 
+      -- henry-backend が要求する JDK (.java-version / buildSrc の jvmToolchain と揃える)
+      -- buildSrc が JVM 25 以上を要求するため、これより古い JDK だと Gradle import が失敗し定義ジャンプも効かなくなる
+      local kotlin_project_jdk = '/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home'
+
       -- kotlin-lsp: root が buildSrc に落ちると precompiled script plugin の import が
       -- freeCompilerArgs 評価で失敗するため、buildSrc を除いた最上位 (henry-backend) を root にする
       vim.lsp.config('kotlin_lsp', {
-        -- Gradle import を JBR(Java25) でなく henry-backend が使う JDK(Corretto21) で走らせる
-        -- (JAVA_HOME 未設定だと LS 自身の JBR で import され source set が空になる問題の実験)
-        cmd_env = { JAVA_HOME = '/Users/okabe/Library/Java/JavaVirtualMachines/corretto-21.0.3/Contents/Home' },
-        -- kotlin-lsp のシンボル解決に使う JDK も Corretto21 に明示 (initializationOptions.defaultJdk)
-        -- cmd_env(=Gradle import 用 JVM) と揃え、bundled JBR25 由来の解決ズレを避ける
+        -- Gradle import を LS 自身の JBR でなく henry-backend が使う JDK で走らせる
+        -- (JAVA_HOME 未設定だと LS 自身の JBR で import され source set が空になる)
+        cmd_env = { JAVA_HOME = kotlin_project_jdk },
+        -- kotlin-lsp のシンボル解決に使う JDK も明示 (initializationOptions.defaultJdk)
+        -- cmd_env(=Gradle import 用 JVM) と揃え、bundled JBR 由来の解決ズレを避ける
         init_options = {
-          defaultJdk = '/Users/okabe/Library/Java/JavaVirtualMachines/corretto-21.0.3/Contents/Home',
+          defaultJdk = kotlin_project_jdk,
           skipImport = false,
         },
         root_dir = function(bufnr, on_dir)

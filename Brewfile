@@ -47,6 +47,7 @@ brew "deno"
 brew "erlang"
 brew "elixir"
 brew "kotlin"
+brew "openjdk@25"                    # henry-backend の JDK (kotlin-lsp の Gradle import でも使う)
 brew "python@3.9"
 
 # ===================
