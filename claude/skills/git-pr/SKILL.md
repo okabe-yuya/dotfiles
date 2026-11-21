@@ -70,8 +70,9 @@ allowed-tools: Bash, Read, Grep, Glob
 ### Step 5: PRの作成
 
 1. **タイトル**: 変更内容を簡潔に表す（70文字以内）
-   - 形式: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:` 等のprefixを付ける
-   - コミットメッセージの傾向がある場合はそれに合わせる
+   - 形式: `<type>: <説明>`（例: `feat: 地ケア初期加算の選択式コメントを自動算定する`）
+     - `type` は `feat` / `fix` / `refactor` / `docs` / `chore` / `test` 等
+     - scope（`feat(receipt-api):` の括弧部分）は付けない。コミットメッセージに scope が付いていてもタイトルには付けない
 
 2. **本文**: テンプレートが存在する場合はその形式に従う。テンプレートがない場合は以下の形式を使う:
 
