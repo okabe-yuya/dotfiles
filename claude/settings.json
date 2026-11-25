@@ -34,25 +34,10 @@
         ]
       }
     ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "osascript -e 'display notification \"💣 Claude Code need your answer\" with title \"Claude Code\"'"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "matcher": "",
         "hooks": [
-          {
-            "type": "command",
-            "command": "osascript -e 'display notification \"✨Done Claude Code\" with title \"Claude Code\"'"
-          },
           {
             "type": "command",
             "command": "bash ~/.claude/hooks/japanese-reply-guard.sh",
